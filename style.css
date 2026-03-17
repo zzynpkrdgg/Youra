@@ -1,0 +1,275 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Engravers MT", serif;
+}
+
+/* Sağ üstteki takvim butonu */
+.calendar-btn {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+    font-family: "Engravers MT", serif;
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.calendar-btn:hover {
+    background-color: black;
+    color: white;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.centered-text {
+    color: black;
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+}
+
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+.action-btn {
+    font-family: "Engravers MT", serif;
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    padding: 10px 0;
+    width: 300px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    transition: background-color 0.4s ease, color 0.4s ease;
+    text-transform: uppercase;
+}
+
+.action-btn:hover {
+    background-color: black;
+    color: white;
+}
+
+/* Calendar Modal Styles */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow-y: auto; /* Aşağı kaydırma için auto yapıldı */
+    overflow-x: hidden;
+    background-color: rgba(255,255,255,0.95);
+    scroll-behavior: smooth; /* Yumuşak kaydırma */
+}
+
+/* Tüm ekranı kaplayan ince detaylı beyaz takvim arka planı */
+.fullscreen-modal {
+    background-color: white; 
+    margin: 0; 
+    padding: 40px;
+    border: none;
+    width: 100%; 
+    min-height: 100%; /* İçeriğe göre uzamasını sağlar */
+    box-sizing: border-box;
+    color: black;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Day Details Pane Styles */
+.day-details-pane {
+    display: none; /* Varsayılan olarak gizli */
+    margin-top: 60px; /* Takvim ile arasındaki boşluk */
+    padding: 40px;
+    border-top: 2px solid black;
+    min-height: 60vh; /* Ekranın altında büyük bir alan kaplaması için */
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.day-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.details-title {
+    font-family: "Engravers MT", serif;
+    font-size: 2rem;
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+.close-details-btn {
+    font-size: 30px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-details-btn:hover {
+    color: gray;
+}
+
+.day-details-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+.details-weather {
+    font-size: 1.5rem;
+    font-family: Arial, sans-serif;
+}
+
+.outfit-placeholder {
+    border: 1px dashed black;
+    padding: 40px;
+    width: 80%;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    color: #555;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding: 0 20px;
+}
+
+.modal-title {
+    text-align: center;
+    font-family: "Engravers MT", serif;
+    letter-spacing: 4px;
+    margin: 0;
+    font-size: 2.5rem;
+    flex-grow: 1;
+}
+
+.nav-btn {
+    background: none;
+    border: 1px solid black;
+    color: black;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 10px 20px;
+    font-family: "Engravers MT", serif;
+    transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+    background-color: black;
+    color: white;
+}
+
+.close-btn {
+    color: black;
+    font-size: 40px;
+    font-weight: normal;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    margin-left: 20px;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: gray;
+    text-decoration: none;
+}
+
+.single-month-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: auto repeat(5, 1fr); /* Başlık satırı + 5-6 hafta */
+    gap: 1px;
+    background-color: black; /* İnce border görünümü için */
+    border: 1px solid black;
+    flex-grow: 1;
+}
+
+.day-header {
+    text-align: center;
+    font-weight: normal;
+    font-size: 1.2rem;
+    padding: 15px 0;
+    color: black;
+    background-color: white;
+    font-family: "Engravers MT", serif;
+    letter-spacing: 2px;
+}
+
+.day {
+    position: relative;
+    background-color: white; /* Beyaz arkaplan */
+    color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    font-family: "Engravers MT", serif;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.day:hover:not(.empty-day) {
+    background-color: #f0f0f0;
+}
+
+.empty-day {
+    background-color: white;
+    cursor: default;
+}
+
+.past-day {
+    background-color: #e0e0e0; /* Açık Gri */
+    color: #888; /* Soluk yazı */
+}
+
+.weather-icon {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 1.5rem;
+    color: black; /* Hava durumu ikonları siyah olsun istendi */
+}
