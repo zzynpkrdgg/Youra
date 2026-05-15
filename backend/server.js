@@ -4,8 +4,8 @@ const express = require("express")
 const cors = require("cors")
 const connectDB = require("./config/db")
 const clothingRoutes = require("./routes/clothingRoutes")
-
 const authRoutes = require("./routes/authRoutes")
+const outfitRoutes = require("./routes/outfitRoutes")
 
 // MongoDB bağlantısı
 connectDB()
@@ -31,3 +31,5 @@ app.listen(PORT, () => {
 })
 
 app.use("/api/clothes", clothingRoutes)
+
+app.use("/api/outfits", outfitRoutes)
