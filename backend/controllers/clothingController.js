@@ -114,7 +114,6 @@ const getMyClothes = async (req, res) => {
 
 const deleteClothing = async (req, res) => {
     try {
-
         const clothing = await Clothing.findById(req.params.id)
 
         if (!clothing) {
@@ -123,17 +122,37 @@ const deleteClothing = async (req, res) => {
             })
         }
 
-        // Kullanıcı kendi kıyafetini silebilsin
         if (clothing.user.toString() !== req.user._id.toString()) {
             return res.status(401).json({
                 message: "Yetkisiz işlem"
             })
         }
 
+        const imageUrl = clothing.image
+        const bucketName = process.env.SUPABASE_BUCKET
+
+        if (imageUrl) {
+            const splitText = `/storage/v1/object/public/${bucketName}/`
+            const filePath = imageUrl.split(splitText)[1]
+
+            if (filePath) {
+                const { error } = await supabase.storage
+                    .from(bucketName)
+                    .remove([filePath])
+
+                if (error) {
+                    return res.status(500).json({
+                        message: "Supabase görsel silme hatası",
+                        error: error.message
+                    })
+                }
+            }
+        }
+
         await clothing.deleteOne()
 
         res.status(200).json({
-            message: "Kıyafet silindi"
+            message: "Kıyafet ve görsel silindi"
         })
 
     } catch (error) {
