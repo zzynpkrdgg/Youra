@@ -15,7 +15,7 @@ exports.analyzeClothing = async (req, res) => {
     // Initialize Gemini API
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     // Use gemini-1.5-flash for image analysis as it is fast and multimodal
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
     const prompt = `Sen bir moda analizi asistanısın. Sana bir kıyafet fotoğrafı göndereceğim. Şu bilgileri JSON formatında döndür:
 { "dominant_colors": ["#hex1", "#hex2"], "style_tags": ["casual", "minimalist"], "season": ["spring", "summer"] }

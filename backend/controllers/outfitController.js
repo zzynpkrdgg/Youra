@@ -2,6 +2,9 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 exports.generateOutfit = async (req, res) => {
   try {
+    if (!req.body) {
+      return res.status(400).json({ error: 'Istek govdesi (body) eksik veya JSON formatinda degil.' });
+    }
     const { user_message, user_style_preferences, wardrobe_items, pinned_items } = req.body;
 
     if (!wardrobe_items || !Array.isArray(wardrobe_items)) {
@@ -14,7 +17,7 @@ exports.generateOutfit = async (req, res) => {
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     // Use gemini-1.5-flash for fast text generation
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
     const systemPrompt = `Sen bir kişisel stil danışmanısın. Kullanıcının dijital gardırobunu analiz ederek en uygun kombinleri öneriyorsun.
 
@@ -66,5 +69,29 @@ Bu bilgilere dayanarak gardıroptaki diğer parçaları da kullanarak komple bir
   } catch (error) {
     console.error("Error generating outfit:", error);
     res.status(500).json({ success: false, error: 'Kombin oluşturma başarısız oldu', details: error.message });
+  }
+};
+
+exports.chatOutfit = async (req, res) => {
+  try {
+    const { message, history } = req.body;
+    if (!message) return res.status(400).json({ message: "Mesaj eksik" });
+
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+
+    let prompt = `Sen Youra isimli bir moda ve stil asistanısın. Kullanıcının sorusuna samimi ve yardımcı bir dille cevap ver.\n\n`;
+    if (history && history.length > 0) {
+      prompt += "Geçmiş konuşmalar:\n" + history.map(h => `${h.role === 'user' ? 'Kullanıcı' : 'Sen'}: ${h.content}`).join('\n') + "\n\n";
+    }
+    prompt += `Kullanıcı: ${message}\nSen:`;
+
+    const result = await model.generateContent(prompt);
+    const reply = result.response.text();
+
+    res.json({ reply });
+  } catch (error) {
+    console.error("Chat error:", error);
+    res.status(500).json({ message: "Yapay zeka yanıt veremedi. Hata: " + error.message });
   }
 };
