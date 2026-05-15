@@ -14,9 +14,7 @@ exports.analyzeClothing = async (req, res) => {
       return res.status(500).json({ error: 'GEMINI_API_KEY is not configured in the environment' });
     }
 
-    // Initialize Gemini API
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    // Use gemini-1.5-flash for image analysis as it is fast and multimodal
     const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
     const prompt = `Sen bir moda analizi asistanısın. Sana bir kıyafet fotoğrafı göndereceğim. Şu bilgileri JSON formatında döndür:
@@ -35,7 +33,6 @@ Sadece geçerli bir JSON döndür, başka hiçbir açıklama yapma. Markdown \`\
     const result = await model.generateContent([prompt, ...imageParts]);
     const responseText = result.response.text();
     
-    // Parse the JSON. Clean up potential markdown formatting from Gemini response.
     let cleanedText = responseText.trim();
     if (cleanedText.startsWith('```json')) {
         cleanedText = cleanedText.substring(7);
@@ -171,6 +168,58 @@ exports.getMyClothes = async (req, res) => {
 
 exports.deleteClothing = async (req, res) => {
     try {
+        const clothing = await Clothing.findById(req.params.id)
+
+        if (!clothing) {
+            return res.status(404).json({
+                message: "Kıyafet bulunamadı"
+            })
+        }
+
+        if (clothing.user.toString() !== req.user._id.toString()) {
+            return res.status(401).json({
+                message: "Yetkisiz işlem"
+            })
+        }
+
+        const imageUrl = clothing.image
+        const bucketName = process.env.SUPABASE_BUCKET
+
+        if (imageUrl) {
+            const splitText = `/storage/v1/object/public/${bucketName}/`
+            const filePath = imageUrl.split(splitText)[1]
+
+            if (filePath) {
+                const { error } = await supabase.storage
+                    .from(bucketName)
+                    .remove([filePath])
+
+                if (error) {
+                    return res.status(500).json({
+                        message: "Supabase görsel silme hatası",
+                        error: error.message
+                    })
+                }
+            }
+        }
+
+        await clothing.deleteOne()
+
+        res.status(200).json({
+            message: "Kıyafet ve görsel silindi"
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Sunucu hatası",
+            error: error.message
+        })
+    }
+}
+
+exports.updateClothing = async (req, res) => {
+    try {
+        const { category, color, style, season } = req.body
 
         const clothing = await Clothing.findById(req.params.id)
 
@@ -180,17 +229,22 @@ exports.deleteClothing = async (req, res) => {
             })
         }
 
-        // Kullanıcı kendi kıyafetini silebilsin
         if (clothing.user.toString() !== req.user._id.toString()) {
             return res.status(401).json({
                 message: "Yetkisiz işlem"
             })
         }
 
-        await clothing.deleteOne()
+        clothing.category = category || clothing.category
+        clothing.color = color || clothing.color
+        clothing.style = style || clothing.style
+        clothing.season = season || clothing.season
+
+        const updatedClothing = await clothing.save()
 
         res.status(200).json({
-            message: "Kıyafet silindi"
+            message: "Kıyafet güncellendi",
+            clothing: updatedClothing
         })
 
     } catch (error) {

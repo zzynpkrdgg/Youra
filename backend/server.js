@@ -18,8 +18,13 @@ const outfitRoutes = require('./routes/outfitRoutes');
 const authRoutes = require('./routes/authRoutes');
 
 app.use('/api/auth', authRoutes);
+
+// Aliased routes so both your AI integration and friend's DB integration work without changing frontend code
 app.use('/api/clothing', clothingRoutes);
+app.use('/api/clothes', clothingRoutes);
+
 app.use('/api/outfit', outfitRoutes);
+app.use('/api/outfits', outfitRoutes);
 
 // Test Route
 app.get('/', (req, res) => {

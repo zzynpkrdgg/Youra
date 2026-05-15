@@ -6,19 +6,21 @@ const {
     addClothing,
     getMyClothes,
     uploadClothing,
-    deleteClothing
+    deleteClothing,
+    updateClothing
 } = require("../controllers/clothingController")
 
 const { protect } = require("../middleware/authMiddleware")
 const upload = require("../middleware/uploadMiddleware")
+
+// AI Kıyafet Analizi rotası
+router.post('/analyze', protect, analyzeClothing);
 
 // Arkadaşının eklediği rotalar
 router.post("/", protect, addClothing)
 router.get("/", protect, getMyClothes)
 router.post("/upload", protect, upload.single("image"), uploadClothing)
 router.delete("/:id", protect, deleteClothing)
-
-// AI Kıyafet Analizi rotası (çakışmayı önlemek için /analyze yapıldı)
-router.post('/analyze', analyzeClothing);
+router.put("/:id", protect, updateClothing)
 
 module.exports = router
