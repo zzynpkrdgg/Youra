@@ -111,8 +111,42 @@ const getMyClothes = async (req, res) => {
     }
 }
 
+
+const deleteClothing = async (req, res) => {
+    try {
+
+        const clothing = await Clothing.findById(req.params.id)
+
+        if (!clothing) {
+            return res.status(404).json({
+                message: "Kıyafet bulunamadı"
+            })
+        }
+
+        // Kullanıcı kendi kıyafetini silebilsin
+        if (clothing.user.toString() !== req.user._id.toString()) {
+            return res.status(401).json({
+                message: "Yetkisiz işlem"
+            })
+        }
+
+        await clothing.deleteOne()
+
+        res.status(200).json({
+            message: "Kıyafet silindi"
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Sunucu hatası",
+            error: error.message
+        })
+    }
+}
+
 module.exports = {
     addClothing,
     uploadClothing,
-    getMyClothes
+    getMyClothes,
+    deleteClothing
 }

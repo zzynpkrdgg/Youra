@@ -4,7 +4,8 @@ const router = express.Router()
 const {
     addClothing,
     getMyClothes,
-    uploadClothing
+    uploadClothing,
+    deleteClothing
 } = require("../controllers/clothingController")
 
 const { protect } = require("../middleware/authMiddleware")
@@ -15,5 +16,7 @@ router.post("/", protect, addClothing)
 router.get("/", protect, getMyClothes)
 
 router.post("/upload", protect, upload.single("image"), uploadClothing)
+
+router.delete("/:id", protect, deleteClothing)
 
 module.exports = router
