@@ -2,40 +2,68 @@
    YOURA — Global Design System
    ===================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
 /* ── Design Tokens ─────────────────────────────────── */
 :root {
-  /* Colors */
-  --color-bg:          #0a0a12;
-  --color-bg-2:        #0f0f1a;
-  --color-bg-3:        #14141f;
-  --color-surface:     rgba(255, 255, 255, 0.04);
-  --color-surface-hover: rgba(255, 255, 255, 0.08);
-  --color-border:      rgba(255, 255, 255, 0.08);
-  --color-border-light: rgba(255, 255, 255, 0.15);
+  /* Colors (Light Theme Default) */
+  --color-bg:          #ffffff;
+  --color-bg-2:        #f3f4f6;
+  --color-bg-3:        #e5e7eb;
+  --color-surface:     rgba(0, 0, 0, 0.02);
+  --color-surface-hover: rgba(0, 0, 0, 0.05);
+  --color-border:      rgba(0, 0, 0, 0.1);
+  --color-border-light: rgba(0, 0, 0, 0.2);
 
-  --color-primary:     #8b5cf6;
-  --color-primary-dark: #7c3aed;
-  --color-primary-light: #a78bfa;
-  --color-primary-glow: rgba(139, 92, 246, 0.3);
+  --color-primary:     #131313;
+  --color-primary-dark: #000000;
+  --color-primary-light: #333333;
+  --color-primary-glow: rgba(0, 0, 0, 0.1);
 
-  --color-accent:      #ec4899;
-  --color-accent-glow: rgba(236, 72, 153, 0.2);
+  --color-accent:      #131313;
+  --color-accent-glow: rgba(0, 0, 0, 0.05);
 
-  --color-text:        #f1f0f5;
-  --color-text-2:      #a09db8;
-  --color-text-3:      #6b6880;
-
-  --color-success:     #10b981;
-  --color-warning:     #f59e0b;
-  --color-error:       #ef4444;
+  --color-text:        #131313;
+  --color-text-2:      #4b5563;
+  --color-text-3:      #6b7280;
+  
+  --color-btn-text:    #ffffff;
 
   /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
-  --gradient-dark:    linear-gradient(180deg, #0a0a12 0%, #0f0f1a 100%);
-  --gradient-card:    linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(236,72,153,0.05) 100%);
+  --gradient-primary: linear-gradient(135deg, #333333 0%, #000000 100%);
+  --gradient-dark:    linear-gradient(180deg, #ffffff 0%, #f3f4f6 100%);
+  --gradient-card:    none;
+}
 
+[data-theme="dark"] {
+  --color-bg:          #131313;
+  --color-bg-2:        #1a1a1a;
+  --color-bg-3:        #222222;
+  --color-surface:     rgba(255, 255, 255, 0.05);
+  --color-surface-hover: rgba(255, 255, 255, 0.1);
+  --color-border:      rgba(255, 255, 255, 0.1);
+  --color-border-light: rgba(255, 255, 255, 0.2);
+
+  --color-primary:     #efefef;
+  --color-primary-dark: #cccccc;
+  --color-primary-light: #ffffff;
+  --color-primary-glow: rgba(239, 239, 239, 0.15);
+
+  --color-accent:      #efefef;
+  --color-accent-glow: rgba(239, 239, 239, 0.1);
+
+  --color-text:        #efefef;
+  --color-text-2:      #a0a0a0;
+  --color-text-3:      #666666;
+  
+  --color-btn-text:    #131313;
+
+  --gradient-primary: linear-gradient(135deg, #efefef 0%, #cccccc 100%);
+  --gradient-dark:    linear-gradient(180deg, #131313 0%, #1a1a1a 100%);
+  --gradient-card:    linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+}
+
+:root {
   /* Spacing */
   --space-1:  0.25rem;
   --space-2:  0.5rem;
@@ -57,7 +85,7 @@
   --radius-full: 9999px;
 
   /* Typography */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: 'Playfair Display', serif;
   --text-xs:   0.75rem;
   --text-sm:   0.875rem;
   --text-base: 1rem;
@@ -166,7 +194,7 @@ ul, ol { list-style: none; }
 
 .btn-primary {
   background: var(--gradient-primary);
-  color: #fff;
+  color: var(--color-btn-text);
   box-shadow: 0 4px 20px var(--color-primary-glow);
 }
 
@@ -181,13 +209,15 @@ ul, ol { list-style: none; }
 .btn-ghost {
   background: var(--color-surface);
   color: var(--color-text);
-  border: 1px solid var(--color-border-light);
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
 }
 
 .btn-ghost:hover {
-  background: var(--color-surface-hover);
-  border-color: var(--color-primary);
-  color: var(--color-primary-light);
+  background: transparent;
+  border-bottom-color: var(--color-text);
+  color: var(--color-text);
 }
 
 .btn-danger {
@@ -278,15 +308,15 @@ ul, ol { list-style: none; }
 }
 
 .badge-primary {
-  background: rgba(139,92,246,0.2);
-  color: var(--color-primary-light);
-  border: 1px solid rgba(139,92,246,0.3);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
 }
 
 .badge-accent {
-  background: rgba(236,72,153,0.15);
-  color: #f472b6;
-  border: 1px solid rgba(236,72,153,0.3);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
 }
 
 /* ── Loading Spinner ───────────────────────────────── */
@@ -327,10 +357,7 @@ ul, ol { list-style: none; }
 
 /* ── Misc ──────────────────────────────────────────── */
 .text-gradient {
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-text);
 }
 
 .divider {

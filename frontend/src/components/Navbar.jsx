@@ -3,8 +3,8 @@ import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
 const NAV_LINKS = [
-  { to: '/wardrobe', label: 'Dolabım', icon: '👗' },
-  { to: '/outfit',   label: 'Kombin',  icon: '✨' },
+  { to: '/wardrobe', label: 'Dolabım' },
+  { to: '/outfit',   label: 'Kombin' },
 ];
 
 export default function Navbar() {
@@ -19,40 +19,41 @@ export default function Navbar() {
 
   return (
     <header className="navbar">
-      <div className="navbar-inner container">
-        {/* Logo */}
-        <Link to="/" className="navbar-logo">
-          <span className="navbar-logo-icon">✦</span>
-          <span className="navbar-logo-text">Youra</span>
-        </Link>
+      <div className="navbar-inner">
+        <div className="navbar-left">
+          {/* Logo */}
+          <Link to="/" className="navbar-logo">
+            <span className="navbar-logo-text">YOURA</span>
+          </Link>
 
-        {/* Nav links — yalnızca giriş yapılmışsa */}
-        {user && (
-          <nav className="navbar-links">
-            {NAV_LINKS.map(({ to, label, icon }) => (
-              <Link
-                key={to}
-                to={to}
-                className={`navbar-link ${location.pathname === to ? 'active' : ''}`}
-              >
-                <span className="navbar-link-icon">{icon}</span>
-                {label}
-              </Link>
-            ))}
-          </nav>
-        )}
+          {/* Nav links — yalnızca giriş yapılmışsa */}
+          {user && (
+            <nav className="navbar-links">
+              {NAV_LINKS.map(({ to, label }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  className={`navbar-link ${location.pathname === to ? 'active' : ''}`}
+                >
+                  {label}
+                </Link>
+              ))}
+            </nav>
+          )}
+        </div>
 
         {/* Actions */}
         <div className="navbar-actions">
           {user ? (
-            <>
-              <Link to="/profile" className="navbar-avatar" title={user.name}>
+            <div className="profile-dropdown-container">
+              <div className="navbar-avatar" title={user.name}>
                 <span>{user.name?.[0]?.toUpperCase() ?? 'U'}</span>
-              </Link>
-              <button className="btn btn-ghost btn-sm" onClick={handleLogout}>
-                Çıkış
-              </button>
-            </>
+              </div>
+              <div className="profile-dropdown">
+                <Link to="/profile" className="dropdown-item">PROFİL</Link>
+                <button className="dropdown-item" onClick={handleLogout}>ÇIKIŞ</button>
+              </div>
+            </div>
           ) : (
             <>
               <Link to="/login"    className="btn btn-ghost btn-sm">Giriş Yap</Link>

@@ -4,15 +4,15 @@ import './ChatBot.css';
 
 const WELCOME = {
   role: 'assistant',
-  content: 'Merhaba! Ben Youra\'nın AI asistanıyım ✦\n\nSana dolabına uygun kombinler önermek, hava durumuna göre tavsiyeler vermek veya stil rehberliği yapmak için buradayım. Nasıl yardımcı olabilirim?',
+  content: 'Merhaba! Ben Youra\'nın AI asistanıyım\n\nSana dolabına uygun kombinler önermek, hava durumuna göre tavsiyeler vermek veya stil rehberliği yapmak için buradayım. Nasıl yardımcı olabilirim?',
 };
 
 const SUGGESTIONS = [
-  '🌤️ Bugün ne giysem?',
-  '👔 Toplantı için kombin öner',
-  '🎉 Parti kıyafeti önerisi',
-  '🏃 Spor kombinini hazırla',
-  '🌧️ Yağmurlu hava için kombin',
+  'Bugün ne giysem?',
+  'Toplantı için kombin öner',
+  'Parti kıyafeti önerisi',
+  'Spor kombinini hazırla',
+  'Yağmurlu hava için kombin',
 ];
 
 export default function ChatBot() {
@@ -42,7 +42,7 @@ export default function ChatBot() {
       setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
     } catch (err) {
       const errMsg = err.response?.data?.message ?? 'Bir hata oluştu. Tekrar deneyin.';
-      setMessages(prev => [...prev, { role: 'assistant', content: `⚠️ ${errMsg}`, isError: true }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: `${errMsg}`, isError: true }]);
     } finally {
       setLoading(false);
       inputRef.current?.focus();
@@ -57,7 +57,7 @@ export default function ChatBot() {
   };
 
   const handleSuggestion = (s) => {
-    sendMessage(s.replace(/^[^\s]+\s/, '')); // emoji kaldır
+    sendMessage(s); // emoji kaldırıldı, text doğrudan gönderiliyor
   };
 
   return (
@@ -67,7 +67,7 @@ export default function ChatBot() {
         {messages.map((msg, i) => (
           <div key={i} className={`chatbot-msg chatbot-msg--${msg.role} ${msg.isError ? 'chatbot-msg--error' : ''} animate-fadein`}>
             {msg.role === 'assistant' && (
-              <div className="chatbot-avatar">✦</div>
+              <div className="chatbot-avatar">Y</div>
             )}
             <div className="chatbot-bubble">
               {msg.content.split('\n').map((line, j) => (
@@ -75,14 +75,14 @@ export default function ChatBot() {
               ))}
             </div>
             {msg.role === 'user' && (
-              <div className="chatbot-avatar chatbot-avatar--user">👤</div>
+              <div className="chatbot-avatar chatbot-avatar--user">U</div>
             )}
           </div>
         ))}
 
         {loading && (
           <div className="chatbot-msg chatbot-msg--assistant animate-fadein">
-            <div className="chatbot-avatar">✦</div>
+            <div className="chatbot-avatar">Y</div>
             <div className="chatbot-bubble chatbot-bubble--typing">
               <span /><span /><span />
             </div>
