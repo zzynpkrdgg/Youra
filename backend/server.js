@@ -2,6 +2,12 @@ require("dotenv").config()
 
 const express = require("express")
 const cors = require("cors")
+const connectDB = require("./config/db")
+
+const authRoutes = require("./routes/authRoutes")
+
+// MongoDB bağlantısı
+connectDB()
 
 const app = express()
 
@@ -14,11 +20,11 @@ app.get("/", (req, res) => {
     res.send("Youra API çalışıyor")
 })
 
+// Routes
+app.use("/api/auth", authRoutes)
+
 const PORT = process.env.PORT || 5000
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
-
-const authRoutes = require("./routes/authRoutes")
-app.use("/api/auth", authRoutes)

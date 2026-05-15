@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
+const User = require("../models/User")
 
 const testAuth = (req, res) => {
     res.json({
@@ -8,84 +9,112 @@ const testAuth = (req, res) => {
 }
 
 const registerUser = async (req, res) => {
+    try {
+        const { username, email, password } = req.body
 
-    const { username, email, password } = req.body
+        if (!username || !email || !password) {
+            return res.status(400).json({
+                message: "Tüm alanlar zorunludur"
+            })
+        }
 
-    // Validation
-    if (!username || !email || !password) {
-        return res.status(400).json({
-            message: "Tüm alanlar zorunludur"
-        })
-    }
+        if (!email.includes("@")) {
+            return res.status(400).json({
+                message: "Geçerli bir email giriniz"
+            })
+        }
 
-    if (!email.includes("@")) {
-        return res.status(400).json({
-            message: "Geçerli bir email giriniz"
-        })
-    }
+        if (password.length < 6) {
+            return res.status(400).json({
+                message: "Şifre en az 6 karakter olmalıdır"
+            })
+        }
 
-    if (password.length < 6) {
-        return res.status(400).json({
-            message: "Şifre en az 6 karakter olmalıdır"
-        })
-    }
+        const existingUser = await User.findOne({ email })
 
-    // Şifre hashleme
-    const hashedPassword = await bcrypt.hash(password, 10)
+        if (existingUser) {
+            return res.status(400).json({
+                message: "Bu email zaten kayıtlı"
+            })
+        }
 
-    res.status(201).json({
-        message: "Kullanıcı başarıyla kayıt edildi",
-        user: {
+        const hashedPassword = await bcrypt.hash(password, 10)
+
+        const user = await User.create({
             username,
             email,
             password: hashedPassword
-        }
-    })
+        })
+
+        res.status(201).json({
+            message: "Kullanıcı başarıyla kayıt edildi",
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email
+            }
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Sunucu hatası",
+            error: error.message
+        })
+    }
 }
 
 const loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body
 
-    const { email, password } = req.body
-
-    // Fake kullanıcı
-    const fakeUser = {
-        id: "12345",
-        username: "bahar",
-        email: "bahar@gmail.com",
-        password: await bcrypt.hash("123456", 10)
-    }
-
-    // Email kontrolü
-    if (email !== fakeUser.email) {
-        return res.status(400).json({
-            message: "Email bulunamadı"
-        })
-    }
-
-    // Şifre kontrolü
-    const isMatch = await bcrypt.compare(password, fakeUser.password)
-
-    if (!isMatch) {
-        return res.status(400).json({
-            message: "Şifre yanlış"
-        })
-    }
-
-    // JWT token oluştur
-    const token = jwt.sign(
-        {
-            id: fakeUser.id
-        },
-        process.env.JWT_SECRET,
-        {
-            expiresIn: "7d"
+        if (!email || !password) {
+            return res.status(400).json({
+                message: "Email ve şifre zorunludur"
+            })
         }
-    )
 
-    res.status(200).json({
-        message: "Giriş başarılı",
-        token
-    })
+        const user = await User.findOne({ email })
+
+        if (!user) {
+            return res.status(400).json({
+                message: "Email bulunamadı"
+            })
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password)
+
+        if (!isMatch) {
+            return res.status(400).json({
+                message: "Şifre yanlış"
+            })
+        }
+
+        const token = jwt.sign(
+            {
+                id: user._id
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "7d"
+            }
+        )
+
+        res.status(200).json({
+            message: "Giriş başarılı",
+            token,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email
+            }
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Sunucu hatası",
+            error: error.message
+        })
+    }
 }
 
 module.exports = {
@@ -93,4 +122,3 @@ module.exports = {
     registerUser,
     loginUser
 }
-
