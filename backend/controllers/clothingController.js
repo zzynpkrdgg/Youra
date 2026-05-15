@@ -1,4 +1,6 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const Clothing = require("../models/Clothing")
+const supabase = require("../config/supabase")
 
 exports.analyzeClothing = async (req, res) => {
   try {
@@ -55,3 +57,146 @@ Sadece geçerli bir JSON döndür, başka hiçbir açıklama yapma. Markdown \`\
     res.status(500).json({ success: false, error: 'Kıyafet analizi başarısız oldu', details: error.message });
   }
 };
+
+exports.addClothing = async (req, res) => {
+    try {
+        const { image, category, color, style, season } = req.body
+
+        if (!image || !category || !color || !style || !season) {
+            return res.status(400).json({
+                message: "Tüm alanlar zorunludur"
+            })
+        }
+
+        const clothing = await Clothing.create({
+            user: req.user._id,
+            image,
+            category,
+            color,
+            style,
+            season
+        })
+
+        res.status(201).json({
+            message: "Kıyafet başarıyla eklendi",
+            clothing
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: "Sunucu hatası",
+            error: error.message
+        })
+    }
+}
+
+exports.uploadClothing = async (req, res) => {
+    try {
+        const { category, color, style, season } = req.body
+
+        if (!req.file) {
+            return res.status(400).json({
+                message: "Görsel dosyası zorunludur"
+            })
+        }
+
+        if (!category || !color || !style || !season) {
+            return res.status(400).json({
+                message: "Kategori, renk, stil ve sezon zorunludur"
+            })
+        }
+
+        const fileExt = req.file.originalname.split(".").pop()
+        const fileName = `${req.user._id}-${Date.now()}.${fileExt}`
+        const filePath = `clothes/${fileName}`
+
+        const { error } = await supabase.storage
+            .from(process.env.SUPABASE_BUCKET)
+            .upload(filePath, req.file.buffer, {
+                contentType: req.file.mimetype
+            })
+
+        if (error) {
+            return res.status(500).json({
+                message: "Supabase yükleme hatası",
+                error: error.message
+            })
+        }
+
+        const { data } = supabase.storage
+            .from(process.env.SUPABASE_BUCKET)
+            .getPublicUrl(filePath)
+
+        const imageUrl = data.publicUrl
+
+        const clothing = await Clothing.create({
+            user: req.user._id,
+            image: imageUrl,
+            category,
+            color,
+            style,
+            season
+        })
+
+        res.status(201).json({
+            message: "Görsel Supabase'e yüklendi ve kıyafet kaydedildi",
+            clothing
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: "Sunucu hatası",
+            error: error.message
+        })
+    }
+}
+
+exports.getMyClothes = async (req, res) => {
+    try {
+        const clothes = await Clothing.find({
+            user: req.user._id
+        }).sort({ createdAt: -1 })
+
+        res.status(200).json({
+            message: "Kıyafetler getirildi",
+            count: clothes.length,
+            clothes
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: "Sunucu hatası",
+            error: error.message
+        })
+    }
+}
+
+
+exports.deleteClothing = async (req, res) => {
+    try {
+
+        const clothing = await Clothing.findById(req.params.id)
+
+        if (!clothing) {
+            return res.status(404).json({
+                message: "Kıyafet bulunamadı"
+            })
+        }
+
+        // Kullanıcı kendi kıyafetini silebilsin
+        if (clothing.user.toString() !== req.user._id.toString()) {
+            return res.status(401).json({
+                message: "Yetkisiz işlem"
+            })
+        }
+
+        await clothing.deleteOne()
+
+        res.status(200).json({
+            message: "Kıyafet silindi"
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Sunucu hatası",
+            error: error.message
+        })
+    }
+}

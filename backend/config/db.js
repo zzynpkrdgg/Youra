@@ -10,7 +10,6 @@ const connectDB = async () => {
         console.log("✅ MongoDB bağlantısı başarılı!");
     } catch (error) {
         console.error("❌ MongoDB bağlantı hatası:", error);
-        // Bağlantı zorunluysa process.exit(1) yapılabilir
     }
 };
 

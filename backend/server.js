@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-
 const connectDB = require('./config/db');
 
 const app = express();
@@ -18,14 +17,14 @@ const clothingRoutes = require('./routes/clothingRoutes');
 const outfitRoutes = require('./routes/outfitRoutes');
 const authRoutes = require('./routes/authRoutes');
 
+app.use('/api/auth', authRoutes);
+app.use('/api/clothing', clothingRoutes);
+app.use('/api/outfit', outfitRoutes);
+
 // Test Route
 app.get('/', (req, res) => {
     res.send('Youra API çalışıyor');
 });
-
-app.use('/api/auth', authRoutes);
-app.use('/api/wardrobe', clothingRoutes);
-app.use('/api/outfit', outfitRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
