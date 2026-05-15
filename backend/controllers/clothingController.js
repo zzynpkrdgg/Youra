@@ -144,9 +144,48 @@ const deleteClothing = async (req, res) => {
     }
 }
 
+const updateClothing = async (req, res) => {
+    try {
+        const { category, color, style, season } = req.body
+
+        const clothing = await Clothing.findById(req.params.id)
+
+        if (!clothing) {
+            return res.status(404).json({
+                message: "Kıyafet bulunamadı"
+            })
+        }
+
+        if (clothing.user.toString() !== req.user._id.toString()) {
+            return res.status(401).json({
+                message: "Yetkisiz işlem"
+            })
+        }
+
+        clothing.category = category || clothing.category
+        clothing.color = color || clothing.color
+        clothing.style = style || clothing.style
+        clothing.season = season || clothing.season
+
+        const updatedClothing = await clothing.save()
+
+        res.status(200).json({
+            message: "Kıyafet güncellendi",
+            clothing: updatedClothing
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Sunucu hatası",
+            error: error.message
+        })
+    }
+}
+
 module.exports = {
     addClothing,
     uploadClothing,
     getMyClothes,
-    deleteClothing
+    deleteClothing,
+    updateClothing
 }
