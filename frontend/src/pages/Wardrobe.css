@@ -58,9 +58,10 @@
 .chip:hover { background: var(--color-surface-hover); color: var(--color-text); }
 
 .chip-active {
-  background: rgba(139,92,246,0.15);
-  border-color: rgba(139,92,246,0.4);
-  color: var(--color-primary-light);
+  background: transparent;
+  border-bottom: 2px solid var(--color-text);
+  border-radius: 0;
+  color: var(--color-text);
 }
 
 .wardrobe-season-select { max-width: 200px; }

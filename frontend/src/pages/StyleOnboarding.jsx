@@ -3,18 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import './StyleOnboarding.css';
 
 const STYLES = [
-  { id: 'casual',       name: 'Casual',        emoji: '👕', desc: 'Rahat günlük şıklık',          color: '#3b82f6' },
-  { id: 'sport',        name: 'Sport',          emoji: '🏃', desc: 'Aktif ve dinamik görünüm',      color: '#10b981' },
-  { id: 'smart-casual', name: 'Smart Casual',   emoji: '👔', desc: 'Şık ama rahat denge',           color: '#8b5cf6' },
-  { id: 'coquette',     name: 'Coquette',       emoji: '🎀', desc: 'Feminen ve zarif detaylar',      color: '#ec4899' },
-  { id: 'streetwear',   name: 'Streetwear',     emoji: '🧢', desc: 'Sokak modasının enerjisi',       color: '#f97316' },
-  { id: 'minimalist',   name: 'Minimalist',     emoji: '◾', desc: 'Az ama öz, sade zarafet',        color: '#94a3b8' },
-  { id: 'y2k',          name: 'Y2K',            emoji: '✨', desc: "2000'lerin retro trendi",        color: '#a855f7' },
-  { id: 'bohemian',     name: 'Boho',           emoji: '🌸', desc: 'Özgür ruhlu bohemian stil',      color: '#d97706' },
-  { id: 'business',     name: 'Business',       emoji: '💼', desc: 'Profesyonel güçlü görünüm',      color: '#475569' },
-  { id: 'vintage',      name: 'Vintage',        emoji: '🕰️', desc: 'Klasik dönemlerin şıklığı',     color: '#92400e' },
-  { id: 'grunge',       name: 'Grunge',         emoji: '🎸', desc: 'Sert ve edgy alternatif stil',   color: '#7f1d1d' },
-  { id: 'elegant',      name: 'Elegant',        emoji: '💎', desc: 'Zamansız sofistike zarafet',     color: '#6366f1' },
+  { id: 'casual',       name: 'Casual',        emoji: '', desc: 'Rahat günlük şıklık',          color: '#3b82f6' },
+  { id: 'sport',        name: 'Sport',          emoji: '', desc: 'Aktif ve dinamik görünüm',      color: '#10b981' },
+  { id: 'smart-casual', name: 'Smart Casual',   emoji: '', desc: 'Şık ama rahat denge',           color: '#8b5cf6' },
+  { id: 'coquette',     name: 'Coquette',       emoji: '', desc: 'Feminen ve zarif detaylar',      color: '#ec4899' },
+  { id: 'streetwear',   name: 'Streetwear',     emoji: '', desc: 'Sokak modasının enerjisi',       color: '#f97316' },
+  { id: 'minimalist',   name: 'Minimalist',     emoji: '', desc: 'Az ama öz, sade zarafet',        color: '#94a3b8' },
+  { id: 'y2k',          name: 'Y2K',            emoji: '', desc: "2000'lerin retro trendi",        color: '#a855f7' },
+  { id: 'bohemian',     name: 'Boho',           emoji: '', desc: 'Özgür ruhlu bohemian stil',      color: '#d97706' },
+  { id: 'business',     name: 'Business',       emoji: '', desc: 'Profesyonel güçlü görünüm',      color: '#475569' },
+  { id: 'vintage',      name: 'Vintage',        emoji: '', desc: 'Klasik dönemlerin şıklığı',     color: '#92400e' },
+  { id: 'grunge',       name: 'Grunge',         emoji: '', desc: 'Sert ve edgy alternatif stil',   color: '#7f1d1d' },
+  { id: 'elegant',      name: 'Elegant',        emoji: '', desc: 'Zamansız sofistike zarafet',     color: '#6366f1' },
 ];
 
 export default function StyleOnboarding() {
@@ -39,7 +39,7 @@ export default function StyleOnboarding() {
 
       <div className="onb-inner animate-fadein">
         <div className="onb-header">
-          <div className="onb-logo">✦ Youra</div>
+          <div className="onb-logo">YOURA</div>
           <h1 className="onb-title">
             Stilini <span className="text-gradient">Tanıyalım</span>
           </h1>

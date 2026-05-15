@@ -7,6 +7,14 @@ import './Wardrobe.css';
 const CATEGORIES = ['Tümü', 'Üst', 'Alt', 'Elbise', 'Dış Giyim', 'Ayakkabı', 'Aksesuar', 'Diğer'];
 const SEASONS    = ['Tümü', 'İlkbahar', 'Yaz', 'Sonbahar', 'Kış', 'Tüm Mevsimler'];
 
+const DEMO_ITEMS = [
+  { _id:'d1', name:'Beyaz T-Shirt',    category:'Üst',       color:'#e8e8e8', season:'Yaz',             brand:'Zara' },
+  { _id:'d2', name:'Siyah Pantolon',   category:'Alt',       color:'#1a1a1a', season:'Tüm Mevsimler',   brand:'' },
+  { _id:'d3', name:'Denim Ceket',      category:'Dış Giyim', color:'#5b7ea6', season:'İlkbahar',        brand:"Levi's" },
+  { _id:'d4', name:'Beyaz Sneaker',    category:'Ayakkabı',  color:'#f0f0f0', season:'Tüm Mevsimler',   brand:'Nike' },
+  { _id:'d5', name:'Çizgili Gömlek',   category:'Üst',       color:'#4a90e2', season:'Tüm Mevsimler',   brand:'' }
+];
+
 export default function Wardrobe() {
   const [items, setItems]           = useState([]);
   const [loading, setLoading]       = useState(true);
@@ -23,7 +31,7 @@ export default function Wardrobe() {
       const { data } = await api.get('/clothing');
       setItems(data);
     } catch {
-      setError('Kıyafetler yüklenemedi.');
+      setItems(DEMO_ITEMS);
     } finally {
       setLoading(false);
     }
@@ -86,7 +94,7 @@ export default function Wardrobe() {
           {/* Search */}
           <input
             className="form-input wardrobe-search"
-            placeholder="🔍 Kıyafet ara..."
+            placeholder="Kıyafet ara..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -124,7 +132,6 @@ export default function Wardrobe() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="wardrobe-empty animate-fadein">
-            <div className="wardrobe-empty-icon">👗</div>
             <h2>
               {items.length === 0 ? 'Dolabın henüz boş' : 'Sonuç bulunamadı'}
             </h2>
@@ -135,7 +142,7 @@ export default function Wardrobe() {
             </p>
             {items.length === 0 && (
               <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-                ✦ İlk Kıyafeti Ekle
+                İlk Kıyafeti Ekle
               </button>
             )}
           </div>

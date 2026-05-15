@@ -5,8 +5,8 @@ import './Outfit.css';
 const TABS = ['Tümü', 'Üst', 'Alt', 'Elbise', 'Dış Giyim', 'Ayakkabı', 'Aksesuar'];
 
 const CAT_ICONS = {
-  'Üst':'👕','Alt':'👖','Elbise':'👗','Dış Giyim':'🧥',
-  'Ayakkabı':'👟','Aksesuar':'👜','Diğer':'🎽',
+  'Üst':'','Alt':'','Elbise':'','Dış Giyim':'',
+  'Ayakkabı':'','Aksesuar':'','Diğer':'',
 };
 
 // Demo kıyafetler (backend hazır olana kadar)
@@ -30,6 +30,7 @@ export default function Outfit() {
   const [chatInput, setChatInput]   = useState('');
   const [messages, setMessages]     = useState([]);
   const [generating, setGenerating] = useState(false);
+  const [isChatExpanded, setIsChatExpanded] = useState(true);
   const [isDragOver, setIsDragOver] = useState(false);
   const dragItemRef                 = useRef(null);
 
@@ -84,6 +85,7 @@ export default function Outfit() {
 
     setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setChatInput('');
+    setIsChatExpanded(true);
     setGenerating(true);
 
     try {
@@ -98,8 +100,8 @@ export default function Outfit() {
       setMessages(prev => [...prev, {
         role: 'ai',
         content: currentMode === 'sifirdan'
-          ? '🌟 Sana önerim: Beyaz t-shirt + siyah slim pantolon + denim ceket kombinasyonu. Rahat ama şık bir görünüm için beyaz sneaker ekleyebilirsin.'
-          : `✨ Seçtiğin ${outfitItems.map(i=>i.name).join(', ')} ile harika görüneceksin! Eksik parçalar için yanına ${outfitItems.length < 2 ? 'koyu renk bir alt + beyaz sneaker' : 'nötr tonlarda bir dış giyim'} öneririm.`,
+          ? 'Sana önerim: Beyaz t-shirt + siyah slim pantolon + denim ceket kombinasyonu. Rahat ama şık bir görünüm için beyaz sneaker ekleyebilirsin.'
+          : `Seçtiğin ${outfitItems.map(i=>i.name).join(', ')} ile harika görüneceksin! Eksik parçalar için yanına ${outfitItems.length < 2 ? 'koyu renk bir alt + beyaz sneaker' : 'nötr tonlarda bir dış giyim'} öneririm.`,
       }]);
     } finally {
       setGenerating(false);
@@ -110,12 +112,9 @@ export default function Outfit() {
     <div className="outfit-builder page-wrapper">
       {/* ── Page Header ─────────────────────────── */}
       <div className="ob-top-bar container">
-        <div>
-          <h1 className="ob-title">
-            <span className="text-gradient">Kombin Oluştur</span>
-          </h1>
-          <p className="ob-sub">Kıyafetleri sürükle, tarzını anlat, kombinini oluştur</p>
-        </div>
+        <h1 className="ob-title">
+          <span className="text-gradient">Kombin Oluştur</span>
+        </h1>
       </div>
 
       {/* ── Main Split Panel ──────────────────────── */}
@@ -124,7 +123,7 @@ export default function Outfit() {
         {/* LEFT — Dolap */}
         <div className="ob-left">
           <div className="ob-panel-title">
-            <span>👗</span> Dolabım
+            Dolabım
             <span className="ob-item-count">{wardrobe.length} parça</span>
           </div>
 
@@ -158,7 +157,7 @@ export default function Outfit() {
                   style={{ background: `linear-gradient(135deg, ${item.color}44, ${item.color}22)` }}
                 >
                   <span className="ob-clothing-emoji">
-                    {CAT_ICONS[item.category] ?? '🎽'}
+                    {CAT_ICONS[item.category] ?? ''}
                   </span>
                   <span
                     className="ob-color-dot"
@@ -178,7 +177,7 @@ export default function Outfit() {
         {/* RIGHT — Kombin Kanvası */}
         <div className="ob-right">
           <div className="ob-panel-title">
-            <span>✦</span> Kombin Kanvası
+            Kombin Kanvası
             {outfitItems.length > 0 && (
               <button className="ob-clear-btn" onClick={clearOutfit}>Temizle</button>
             )}
@@ -192,7 +191,6 @@ export default function Outfit() {
           >
             {outfitItems.length === 0 ? (
               <div className="ob-canvas-placeholder">
-                <span className="ob-canvas-icon">👆</span>
                 <p>Kıyafetleri buraya sürükle</p>
                 <span className="ob-canvas-hint">Sol panelden kıyafet sürükleyip bırak</span>
               </div>
@@ -207,7 +205,7 @@ export default function Outfit() {
                           className="ob-canvas-thumb"
                           style={{ background: `linear-gradient(135deg, ${item.color}55, ${item.color}22)` }}
                         >
-                          <span>{CAT_ICONS[item.category] ?? '🎽'}</span>
+                          <span>{CAT_ICONS[item.category] ?? ''}</span>
                         </div>
                         <span className="ob-canvas-item-name">{item.name}</span>
                         <button
@@ -230,21 +228,41 @@ export default function Outfit() {
 
         {/* AI Mesajları */}
         {messages.length > 0 && (
-          <div className="ob-messages">
-            {messages.map((m, i) => (
-              <div key={i} className={`ob-msg ob-msg--${m.role} animate-fadein`}>
-                {m.role === 'ai' && <span className="ob-msg-avatar">✦</span>}
-                <div className="ob-msg-bubble">{m.content}</div>
-                {m.role === 'user' && <span className="ob-msg-avatar ob-msg-avatar--user">👤</span>}
-              </div>
-            ))}
-            {generating && (
-              <div className="ob-msg ob-msg--ai animate-fadein">
-                <span className="ob-msg-avatar">✦</span>
-                <div className="ob-msg-bubble ob-msg-bubble--typing">
-                  <span /><span /><span />
+          <div className="ob-messages-wrapper animate-fadein">
+            {isChatExpanded ? (
+              <>
+                <button 
+                  className="ob-chat-toggle" 
+                  onClick={() => setIsChatExpanded(false)}
+                  title="Küçült"
+                >
+                  ▼
+                </button>
+                <div className="ob-messages">
+                  {messages.map((m, i) => (
+                    <div key={i} className={`ob-msg ob-msg--${m.role} animate-fadein`}>
+                      {m.role === 'ai' && <span className="ob-msg-avatar">Y</span>}
+                      <div className="ob-msg-bubble">{m.content}</div>
+                      {m.role === 'user' && <span className="ob-msg-avatar ob-msg-avatar--user">U</span>}
+                    </div>
+                  ))}
+                  {generating && (
+                    <div className="ob-msg ob-msg--ai animate-fadein">
+                      <span className="ob-msg-avatar">Y</span>
+                      <div className="ob-msg-bubble ob-msg-bubble--typing">
+                        <span /><span /><span />
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
+              </>
+            ) : (
+              <button 
+                className="ob-chat-expand-btn animate-fadein" 
+                onClick={() => setIsChatExpanded(true)}
+              >
+                Sohbet Geçmişini Göster ({messages.length} mesaj)
+              </button>
             )}
           </div>
         )}
@@ -254,8 +272,8 @@ export default function Outfit() {
             className="ob-chat-input"
             placeholder={
               outfitItems.length === 0
-                ? '💬 Nasıl bir kombin istiyorsun? Örn: İş toplantısına gidiyorum...'
-                : '💬 Kombinine ne eklensin? Örn: Casual ama biraz daha şık olsun...'
+                ? 'Nasıl bir kombin istiyorsun? Örn: İş toplantısına gidiyorum...'
+                : 'Kombinine ne eklensin? Örn: Casual ama biraz daha şık olsun...'
             }
             value={chatInput}
             onChange={e => setChatInput(e.target.value)}
@@ -269,7 +287,7 @@ export default function Outfit() {
           >
             {generating
               ? <span className="spinner" />
-              : <><span>✦</span> Kombini Oluştur</>}
+              : <>Kombini Oluştur</>}
           </button>
         </div>
       </div>
