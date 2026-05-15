@@ -11,7 +11,14 @@ app.use(express.json({ limit: '50mb' }));
 // Routes
 const clothingRoutes = require('./routes/clothingRoutes');
 const outfitRoutes = require('./routes/outfitRoutes');
+const authRoutes = require('./routes/authRoutes');
 
+// Test Route
+app.get('/', (req, res) => {
+    res.send('Youra API çalışıyor');
+});
+
+app.use('/api/auth', authRoutes);
 app.use('/api/wardrobe', clothingRoutes);
 app.use('/api/outfit', outfitRoutes);
 
