@@ -7,6 +7,7 @@ import Register from './pages/Register';
 import Wardrobe from './pages/Wardrobe';
 import Outfit   from './pages/Outfit';
 import Profile  from './pages/Profile';
+import StyleOnboarding from './pages/StyleOnboarding';
 
 // Protected route wrapper
 function ProtectedRoute({ children }) {
@@ -37,6 +38,10 @@ function AppRoutes() {
 
         <Route path="/register" element={
           <PublicRoute><Register /></PublicRoute>
+        } />
+
+        <Route path="/onboarding" element={
+          <ProtectedRoute><StyleOnboarding /></ProtectedRoute>
         } />
 
         <Route path="/wardrobe" element={
