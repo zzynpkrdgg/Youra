@@ -5,10 +5,10 @@ exports.generateOutfit = async (req, res) => {
     if (!req.body) {
       return res.status(400).json({ error: 'Istek govdesi (body) eksik veya JSON formatinda degil.' });
     }
-    const { user_message, user_style_preferences, wardrobe_items, pinned_items } = req.body;
+    const { message, styles, wardrobe, items, mode } = req.body;
 
-    if (!wardrobe_items || !Array.isArray(wardrobe_items)) {
-      return res.status(400).json({ error: 'wardrobe_items is required and must be an array' });
+    if (!wardrobe || !Array.isArray(wardrobe)) {
+      return res.status(400).json({ error: 'wardrobe is required and must be an array' });
     }
 
     if (!process.env.GEMINI_API_KEY) {
@@ -16,48 +16,42 @@ exports.generateOutfit = async (req, res) => {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    // Use gemini-1.5-flash for fast text generation
     const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+
+    // Simplify wardrobe representation to save tokens
+    const simpleWardrobe = wardrobe.map(w => ({
+      _id: w._id,
+      name: w.name,
+      category: w.category,
+      color: w.color,
+      style: w.style || w.season || ''
+    }));
 
     const systemPrompt = `Sen bir kişisel stil danışmanısın. Kullanıcının dijital gardırobunu analiz ederek en uygun kombinleri öneriyorsun.
 
-Kullanıcının tercih ettiği tarzlar: ${user_style_preferences && user_style_preferences.length > 0 ? user_style_preferences.join(', ') : 'Belirtilmemiş'}
+Kullanıcının tercih ettiği tarzlar: ${styles && styles.length > 0 ? styles.join(', ') : 'Belirtilmemiş'}
 
 Gardırobu şu kıyafetlerden oluşuyor (JSON listesi):
-${JSON.stringify(wardrobe_items, null, 2)}
+${JSON.stringify(simpleWardrobe, null, 2)}
 
-Kombin önerirken şunlara dikkat et:
-- Renk uyumunu göz önünde bulundur.
-- Kullanıcının tarz tercihlerine sadık kal.
-- Kombinleri giyim katmanlarına göre (üst, alt, dış giyim, aksesuar) mantıklı bir şekilde organize et.
-
-Lütfen çıktını JSON formatında ver. Örnek çıktı:
+Lütfen çıktını SADECE aşağıdaki JSON formatında ver.
 {
-  "outfit": [
-    { "id": "item1", "category": "tişört", "color": "#123456", "reason": "Rahatlık ve temel bir katman sağlamak için." }
-  ],
-  "explanation": "Genel kombin açıklaması..."
+  "suggested_outfit": ["kıyafet_id_1", "kıyafet_id_2"],
+  "explanation": "Kombin açıklaması (Neden bu parçaları seçtin, nasıl tamamlıyor vb.)"
 }
-Sadece geçerli bir JSON döndür, başka hiçbir açıklama yapma.`;
+ÖNEMLİ: "suggested_outfit" dizisi sadece string ID'lerden (\`_id\`) oluşmalıdır. Açıklamanı samimi ve kısa tut. Markdown \`\`\`json tagi koymadan sadece JSON dön.`;
 
-    const userPrompt = `Kullanıcının özellikle seçtiği parçalar: ${JSON.stringify(pinned_items || [])}
-Kullanıcının isteği: "${user_message || 'Bana rastgele güzel bir kombin öner.'}"
-
-Bu bilgilere dayanarak gardıroptaki diğer parçaları da kullanarak komple bir kombin oluştur. Eğer gardıropta yeterli parça yoksa veya eşleşmiyorsa olanlarla yapabileceğinin en iyisini yap.`;
+    const userPrompt = `Kullanıcının hali hazırda seçtiği parçalar: ${JSON.stringify(items || [])}
+Kullanıcının isteği: "${message || 'Bana rastgele güzel bir kombin öner.'}"
+Mod: ${mode === 'tamamla' ? 'Kullanıcının seçtiği parçalara dolaptan uygun parçalar ekleyerek tamamla.' : 'Dolaptan tamamen yeni, sıfırdan bir kombin oluştur.'}`;
 
     const result = await model.generateContent([systemPrompt, userPrompt]);
     const responseText = result.response.text();
     
-    // Parse the JSON output and handle potential markdown ticks
     let cleanedText = responseText.trim();
-    if (cleanedText.startsWith('```json')) {
-        cleanedText = cleanedText.substring(7);
-    } else if (cleanedText.startsWith('```')) {
-        cleanedText = cleanedText.substring(3);
-    }
-    if (cleanedText.endsWith('```')) {
-        cleanedText = cleanedText.slice(0, -3);
-    }
+    if (cleanedText.startsWith('```json')) cleanedText = cleanedText.substring(7);
+    else if (cleanedText.startsWith('```')) cleanedText = cleanedText.substring(3);
+    if (cleanedText.endsWith('```')) cleanedText = cleanedText.slice(0, -3);
 
     const outfitSuggestion = JSON.parse(cleanedText.trim());
 

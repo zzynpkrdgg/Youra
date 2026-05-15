@@ -37,7 +37,7 @@ export default function Outfit() {
   // Dolabı çek
   useEffect(() => {
     api.get('/clothing')
-      .then(({ data }) => setWardrobe(data))
+      .then(({ data }) => setWardrobe(data.clothes || data || DEMO_ITEMS))
       .catch(() => setWardrobe(DEMO_ITEMS));
   }, []);
 
@@ -94,9 +94,32 @@ export default function Outfit() {
         mode:       currentMode,
         items:      outfitItems,
         styles,
+        wardrobe:   wardrobe
       });
-      setMessages(prev => [...prev, { role: 'ai', content: data.reply ?? data.suggestion ?? JSON.stringify(data) }]);
-    } catch {
+      
+      const aiData = data.data;
+      if (aiData && aiData.suggested_outfit) {
+        // AI'dan dönen ID'leri eşleştir
+        const suggestedItems = wardrobe.filter(item => aiData.suggested_outfit.includes(item._id));
+        
+        if (currentMode === 'sifirdan') {
+          setOutfitItems(suggestedItems.slice(0, 9));
+        } else {
+          setOutfitItems(prev => {
+            const existingIds = new Set(prev.map(i => i._id));
+            const newItems = suggestedItems.filter(i => !existingIds.has(i._id));
+            return [...prev, ...newItems].slice(0, 9);
+          });
+        }
+        
+        if (aiData.explanation) {
+           setMessages(prev => [...prev, { role: 'ai', content: aiData.explanation }]);
+        }
+      } else {
+        setMessages(prev => [...prev, { role: 'ai', content: data.reply ?? data.suggestion ?? JSON.stringify(data) }]);
+      }
+    } catch (err) {
+      console.error(err);
       setMessages(prev => [...prev, {
         role: 'ai',
         content: currentMode === 'sifirdan'
@@ -106,7 +129,7 @@ export default function Outfit() {
     } finally {
       setGenerating(false);
     }
-  }, [chatInput, outfitItems, generating]);
+  }, [chatInput, outfitItems, generating, wardrobe]);
 
   return (
     <div className="outfit-builder page-wrapper">
