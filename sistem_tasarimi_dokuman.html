@@ -1,0 +1,658 @@
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: var(--font-sans);
+  }
+
+  .doc {
+    padding: 0 0 2rem;
+  }
+
+  .cover {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-left: 3px solid var(--color-border-info);
+  }
+
+  .cover h1 {
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: 4px;
+  }
+
+  .cover p {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+  }
+
+  .section {
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: 1rem;
+    padding-bottom: 8px;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title i {
+    font-size: 18px;
+    color: var(--color-text-secondary);
+  }
+
+  .sub {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin: 1.25rem 0 0.5rem;
+  }
+
+  p {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin-bottom: 0.75rem;
+  }
+
+  .card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card-title i {
+    font-size: 15px;
+  }
+
+  .card p {
+    margin: 0;
+    font-size: 13px;
+  }
+
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .grid3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+
+  .flow {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .flow-step {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+  }
+
+  .flow-arrow {
+    color: var(--color-text-tertiary);
+    padding: 0 6px;
+    align-self: center;
+    font-size: 16px;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-weight: 500;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  .badge-blue {
+    background: var(--color-background-info);
+    color: var(--color-text-info);
+  }
+
+  .badge-green {
+    background: var(--color-background-success);
+    color: var(--color-text-success);
+  }
+
+  .badge-amber {
+    background: var(--color-background-warning);
+    color: var(--color-text-warning);
+  }
+
+  .code-block {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    padding: 12px 16px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    border: 0.5px solid var(--color-border-tertiary);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .note {
+    background: var(--color-background-info);
+    border: 0.5px solid var(--color-border-info);
+    border-radius: var(--border-radius-md);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--color-text-info);
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .note i {
+    font-size: 15px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .warn {
+    background: var(--color-background-warning);
+    border: 0.5px solid var(--color-border-warning);
+    border-radius: var(--border-radius-md);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--color-text-warning);
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .warn i {
+    font-size: 15px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .table {
+    width: 100%;
+    font-size: 13px;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+
+  .table th {
+    text-align: left;
+    padding: 8px 12px;
+    background: var(--color-background-secondary);
+    font-weight: 500;
+    color: var(--color-text-primary);
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+
+  .table td {
+    padding: 8px 12px;
+    color: var(--color-text-secondary);
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+
+  .table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .toc {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    cursor: pointer;
+  }
+
+  .toc-item:last-child {
+    border-bottom: none;
+  }
+
+  .toc-item:hover {
+    color: var(--color-text-primary);
+  }
+
+  .toc-num {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    min-width: 20px;
+  }
+
+  .divider {
+    border: none;
+    border-top: 0.5px solid var(--color-border-tertiary);
+    margin: 2rem 0;
+  }
+
+  .prompt-box {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    border: 0.5px solid var(--color-border-tertiary);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin-bottom: 0.75rem;
+  }
+
+  .prompt-box strong {
+    color: var(--color-text-primary);
+    font-weight: 500;
+  }
+
+  .prompt-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+</style>
+
+<div class="doc">
+
+  <div class="cover">
+    <h1>Wardrobe AI — Sistem Tasarımı Dokümanı</h1>
+    <p>AI Destekli Kombin Oluşturma Uygulaması &nbsp;·&nbsp; v1.0 &nbsp;·&nbsp; Gemini API</p>
+  </div>
+
+  <div class="toc">
+    <div class="toc-item"><span class="toc-num">1</span> Proje Özeti & Hedefler</div>
+    <div class="toc-item"><span class="toc-num">2</span> Sayfa Mimarisi (Ekranlar)</div>
+    <div class="toc-item"><span class="toc-num">3</span> Veri Modeli</div>
+    <div class="toc-item"><span class="toc-num">4</span> Gemini API Entegrasyonu & Prompt Engineering</div>
+    <div class="toc-item"><span class="toc-num">5</span> Teknik Stack Önerisi</div>
+    <div class="toc-item"><span class="toc-num">6</span> Backend API Endpoints</div>
+    <div class="toc-item"><span class="toc-num">7</span> Görsel İşleme Pipeline</div>
+    <div class="toc-item"><span class="toc-num">8</span> Kullanıcı Akışı</div>
+    <div class="toc-item"><span class="toc-num">9</span> MVP & Gelecek Özellikleri</div>
+  </div>
+
+  <!-- 1 -->
+  <div class="section" id="s1">
+    <div class="section-title"><i class="ti ti-target" aria-hidden="true"></i> 1. Proje Özeti & Hedefler</div>
+    <p>Wardrobe AI, kullanıcıların kıyafet fotoğraflarını yükleyerek dijital bir gardrop oluşturduğu ve ardından yapay
+      zeka yardımıyla kombin önerileri aldığı bir web uygulamasıdır. Gemini'nin multimodal (metin + görsel) yetenekleri
+      bu projenin çekirdeğini oluşturur.</p>
+    <div class="grid3">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-user-check" aria-hidden="true"></i> Kullanıcı</div>
+        <p>Kıyafetlerini dijital ortamda yönetmek ve kombinleri kolayca planlamak isteyen kişiler</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-sparkles" aria-hidden="true"></i> Temel Değer</div>
+        <p>Dolapta ne olduğunu bilerek, nereye gideceğine uygun, AI destekli kombin oluşturma</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-cpu" aria-hidden="true"></i> AI Katmanı</div>
+        <p>Gemini 1.5 Pro — görsel analiz + doğal dil ile kombin prompt'u anlama</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 2 -->
+  <div class="section" id="s2">
+    <div class="section-title"><i class="ti ti-layout" aria-hidden="true"></i> 2. Sayfa Mimarisi (Ekranlar)</div>
+    <p>PDF wireframe'inizden çıkardığım 5 ana ekran ve aralarındaki geçiş mantığı:</p>
+
+    <div class="card">
+      <div class="card-title"><i class="ti ti-door-enter" aria-hidden="true"></i> Ekran 1 — Karşılama (Hoşgeldiniz)
+      </div>
+      <p>Sign in / Sign up tab'ları. Sign up formu: kullanıcı adı, e-posta, şifre. Kayıt sonrası direkt Tarz Seçme
+        ekranına yönlendir.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-shirt" aria-hidden="true"></i> Ekran 2 — Tarz Seçme <span
+          class="badge badge-blue">Onboarding</span></div>
+      <p>"Hangi giyim tarzları ilginizi çeker?" — Sport, Casual, Smart Casual, Coquette vb. Çoklu seçim, sonraki ekrana
+        ok butonu. Bu seçimler kullanıcı profiline kaydedilir ve her kombin isteğinde prompt'a eklenir.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-upload" aria-hidden="true"></i> Ekran 3 — Gardrop Yönetimi <span
+          class="badge badge-green">Ana sayfa</span></div>
+      <p>Fotoğraf yükleme + kategori seçme (tişört, gömlek, etek, ceket). Sonraki sayfada: background silme + renk
+        analizi (Gemini Vision). Yüklenen parçalar grid olarak görüntülenir.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-wand" aria-hidden="true"></i> Ekran 4 — Kombin Oluşturucu <span
+          class="badge badge-amber">Çekirdek</span></div>
+      <p>Sol taraf: gardrop grid'i (tişört, gömlek, etek, ceket sekmeleri). Drag & drop ile sağdaki "drop zone"a parça
+        sürükle. Alt kısım: chatbot input alanı — "nereye gidiyorsun, ne istiyorsun" bilgisini metin olarak al. "Kombini
+        oluştur" butonu Gemini'ye istek gönderir.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-sparkles" aria-hidden="true"></i> Ekran 5 — Kombin Sonucu</div>
+      <p>Gemini'nin önerdiği kombinasyonun görseli + açıklaması. Kaydet / Yeniden oluştur seçenekleri.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 3 -->
+  <div class="section" id="s3">
+    <div class="section-title"><i class="ti ti-database" aria-hidden="true"></i> 3. Veri Modeli</div>
+    <p>Minimum viable veri yapısı. İlk aşamada PostgreSQL veya Firebase Firestore kullanabilirsin.</p>
+
+    <div class="sub">Tablolar / Koleksiyonlar</div>
+
+    <div class="code-block">users
+      id, email, username, password_hash
+      style_preferences: ["casual", "sport"] ← tarz seçme ekranından gelir
+      created_at
+
+      wardrobe_items
+      id, user_id
+      image_url ← storage'daki URL (background silinmiş)
+      category ← "tişört" | "gömlek" | "etek" | "ceket" | ...
+      colors: ["#3B4A6B", "#F5E6D3"] ← Gemini'nin çıkardığı renkler(daha sonrasında eğittiğimiz model renk analizini
+      yapıcak)
+      tags: ["casual", "slim fit"] ← isteğe bağlı AI analizi
+      created_at
+
+      outfits
+      id, user_id
+      items: [item_id, item_id, ...] ← kombindeki parçaların id listesi
+      prompt_text ← kullanıcının yazdığı metin
+      ai_suggestion ← Gemini'nin döndürdüğü açıklama
+      created_at</div>
+
+    <div class="note"><i class="ti ti-info-circle" aria-hidden="true"></i> Kıyafet görsellerini bir cloud storage'da
+      (Firebase Storage, Supabase Storage veya AWS S3) tutmalısın. Veritabanına sadece URL kaydet.</div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 4 -->
+  <div class="section" id="s4">
+    <div class="section-title"><i class="ti ti-brain" aria-hidden="true"></i> 4. Gemini API & Prompt Engineering</div>
+    <p>Bu projenin en kritik kısmı. Gemini 1.5 Pro multimodal model kullanıyorsun — hem görsel hem metin
+      gönderebilirsin. İki farklı Gemini çağrısı yapacaksın:</p>
+
+    <div class="sub">Çağrı A — Kıyafet Yüklenirken (Analiz)</div>
+    <p>Kullanıcı fotoğraf yüklediğinde bir kez çalışır. Kıyafetin rengini, kategorisini ve uyum etiketlerini çıkarır.
+    </p>
+    <div class="prompt-label">Sistem Prompt'u</div>
+    <div class="prompt-box">
+      Sen bir moda analizi asistanısın. Sana bir kıyafet fotoğrafı göndereceğim. Şu bilgileri JSON formatında
+      döndür:<br><br>
+      <strong>{ "dominant_colors": ["#hex1", "#hex2"], "style_tags": ["casual", "minimalist"], "season": ["spring",
+        "summer"] }</strong><br><br>
+      Sadece JSON döndür, başka açıklama yapma.
+    </div>
+
+    <div class="sub">Çağrı B — Kombin Oluşturma (Çekirdek)</div>
+    <p>Kullanıcı chatbot alanına yazar ve "Kombini oluştur"a tıklar. Gardroptaki tüm kıyafet bilgileri + kullanıcının
+      tarzı + isteği prompt'a eklenir.</p>
+    <div class="prompt-label">Sistem Prompt'u (sabit, her seferinde gönderilir)</div>
+    <div class="prompt-box">
+      Sen bir kişisel stil danışmanısın. Kullanıcının dijital gardrobunu analiz ederek en uygun kombinleri
+      öneriyorsun.<br><br>
+      Kullanıcının tercih ettiği tarzlar: <strong>{user.style_preferences}</strong><br><br>
+      Gardrobu şu kıyafetlerden oluşuyor:<br>
+      <strong>{wardrobe_items listesi — her parça için: kategori, renkler, etiketler}</strong><br><br>
+      Kombin önerirken şunlara dikkat et:<br>
+      - Renk uyumunu göz önünde bulundur<br>
+      - Kullanıcının tarz tercihlerine sadık kal<br>
+      - Kombinleri giyim katmanlarına göre (üst/alt/dış giyim/aksesuar) organize et
+    </div>
+    <div class="prompt-label">Kullanıcı Mesajı (dinamik)</div>
+    <div class="prompt-box">
+      Kullanıcının özellikle seçtiği parçalar (drag & drop ile): <strong>{pinned_items listesi}</strong><br><br>
+      Kullanıcının isteği: <strong>"{user_message}"</strong><br><br>
+      Bu bilgilere dayanarak gardrobundaki diğer parçaları da kullanarak komple bir kombin oluştur. Her parçanın
+      kategori ve rengini belirt, neden bu kombinasyonu seçtiğini kısaca açıkla.
+    </div>
+
+    <div class="note"><i class="ti ti-bulb" aria-hidden="true"></i> Kullanıcı drag & drop yapmadan sadece metin yazarsa,
+      pinned_items boş gönderilir. Gemini gardrobun tamamından seçim yapar. Bu tamamen çalışır.</div>
+    <div class="warn"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Gemini'ye görsel gönderdiğinde token
+      maliyeti artar. Kıyafet analizi (Çağrı A) yükleme anında sadece bir kez yap, sonuçları veritabanına kaydet. Kombin
+      oluştururken (Çağrı B) sadece metin gönder — analiz sonuçlarını JSON olarak prompt'a ekle, görselleri tekrar
+      gönderme.</div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 5 -->
+  <div class="section" id="s5">
+    <div class="section-title"><i class="ti ti-stack" aria-hidden="true"></i> 5. Teknik Stack Önerisi</div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-brand-nextjs" aria-hidden="true"></i> Frontend</div>
+        <p>Next.js 14 (App Router) + Tailwind CSS. Drag & drop için <strong>dnd-kit</strong> kütüphanesi önerilir.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-server" aria-hidden="true"></i> Backend</div>
+        <p>Next.js API Routes (ilk aşama için yeterli) veya ayrı bir Node.js/Express API.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-database" aria-hidden="true"></i> Veritabanı</div>
+        <p>Supabase (PostgreSQL + Storage + Auth — hepsini tek yerden çözüyor, ücretsiz tier var).</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-photo" aria-hidden="true"></i> Görsel İşleme</div>
+        <p>Background silme için <strong>remove.bg API</strong> veya <strong>Replicate (REMBG modeli)</strong>. Sonucu
+          Supabase Storage'a yükle.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-brain" aria-hidden="true"></i> AI</div>
+        <p>Google Gemini 1.5 Pro — <strong>@google/generative-ai</strong> npm paketi ile. API key server-side'da sakla,
+          client'a asla açma.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-lock" aria-hidden="true"></i> Auth</div>
+        <p>Supabase Auth (built-in) veya NextAuth.js. Email/şifre ile başla, OAuth sonra eklenebilir.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 6 -->
+  <div class="section" id="s6">
+    <div class="section-title"><i class="ti ti-api" aria-hidden="true"></i> 6. Backend API Endpoints</div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Method</th>
+          <th>Endpoint</th>
+          <th>Açıklama</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>POST</td>
+          <td>/api/auth/register</td>
+          <td>Kayıt ol + tarz seçimlerini kaydet</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/auth/login</td>
+          <td>Giriş yap</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/api/wardrobe</td>
+          <td>Kullanıcının tüm kıyafetlerini getir</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/wardrobe/upload</td>
+          <td>Görsel yükle → background sil → Gemini analiz → DB'ye kaydet</td>
+        </tr>
+        <tr>
+          <td>DELETE</td>
+          <td>/api/wardrobe/:id</td>
+          <td>Kıyafeti sil</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/outfit/generate</td>
+          <td>Pinned items + user message → Gemini → kombin önerisi döndür</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/outfit/save</td>
+          <td>Beğenilen kombini kaydet</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/api/outfit/history</td>
+          <td>Kaydedilen kombinleri listele</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 7 -->
+  <div class="section" id="s7">
+    <div class="section-title"><i class="ti ti-photo-scan" aria-hidden="true"></i> 7. Görsel İşleme Pipeline</div>
+    <p>Kullanıcı fotoğraf yüklediğinde arka planda sırayla şunlar olur:</p>
+    <div class="flow">
+      <div class="flow-step">1. Kullanıcı fotoğraf seçer</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">2. Frontend → /api/wardrobe/upload</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">3. Remove.bg ile background silinir</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">4. Temiz görsel Storage'a yüklenir</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">5. Gemini Çağrı A: renk + tag analizi</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">6. Tüm veriler DB'ye kaydedilir</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">7. Frontend güncellenir</div>
+    </div>
+    <div class="note"><i class="ti ti-info-circle" aria-hidden="true"></i> 3-6 adımları server-side çalışır. Kullanıcı
+      sadece yükleme ve sonucu görür. Bu pipeline yaklaşık 3-8 saniye sürer — frontend'de loading state göster.</div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 8 -->
+  <div class="section" id="s8">
+    <div class="section-title"><i class="ti ti-route" aria-hidden="true"></i> 8. Kombin Oluşturma Kullanıcı Akışı</div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-arrows-right" aria-hidden="true"></i> Senaryo A — Drag & Drop + Mesaj
+      </div>
+      <p>Kullanıcı tişörte tıklar → drop zone'a sürükler → "Arkadaşımın doğum günü partisine gidiyorum, şık ama rahat
+        bir kombin istiyorum" yazar → Kombini oluştur'a basar. Gemini hem tişörtü hem mesajı değerlendirerek gardroptan
+        uygun alt, dış giyim ve aksesuar önerir.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-message" aria-hidden="true"></i> Senaryo B — Sadece Mesaj</div>
+      <p>Drop zone boş. Kullanıcı "Yarın iş toplantısı var, smart casual bir kombin lazım" yazar. Gemini tüm gardrobu
+        tarayarak en uygun kombinasyonu önerir.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-drag-drop" aria-hidden="true"></i> Senaryo C — Sadece Drag & Drop</div>
+      <p>Kullanıcı birkaç parça sürükler, mesaj alanı boş bırakır. Gemini seçilen parçaları tamamlayacak diğer parçaları
+        önerir, tarz tercihlerine göre yorumlar.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 9 -->
+  <div class="section" id="s9">
+    <div class="section-title"><i class="ti ti-list-check" aria-hidden="true"></i> 9. MVP & Gelecek Özellikleri</div>
+    <div class="grid2">
+      <div>
+        <div class="sub">MVP (ilk sürüm)</div>
+        <div class="card">
+          <p>✓ Kayıt / giriş</p>
+        </div>
+        <div class="card">
+          <p>✓ Tarz seçme ekranı</p>
+        </div>
+        <div class="card">
+          <p>✓ Fotoğraf yükleme + kategori seçme</p>
+        </div>
+        <div class="card">
+          <p>✓ Gardrop grid görünümü</p>
+        </div>
+        <div class="card">
+          <p>✓ Drag & drop + chatbot ile kombin oluşturma</p>
+        </div>
+        <div class="card">
+          <p>✓ Gemini kombin önerisi + açıklama</p>
+        </div>
+      </div>
+      <div>
+        <div class="sub">V2 Özellikler</div>
+        <div class="card">
+          <p>◯ Background silme otomasyonu</p>
+        </div>
+        <div class="card">
+          <p>◯ Kombini görsel olarak render etme (parçaları birleştir)</p>
+        </div>
+        <div class="card">
+          <p>◯ Hava durumu entegrasyonu (bugün ne giysem?)</p>
+        </div>
+        <div class="card">
+          <p>◯ Kaydedilen kombinler sayfası</p>
+        </div>
+        <div class="card">
+          <p>◯ Sosyal paylaşım</p>
+        </div>
+        <div class="card">
+          <p>◯ Eksik parça önerisi (gardropunda şu yok, şunu alsan...)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
