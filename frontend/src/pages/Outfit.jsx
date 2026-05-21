@@ -38,19 +38,6 @@ export default function Outfit() {
   const [addLoading, setAddLoading] = useState(false);
   const [weather, setWeather]       = useState(null);
 
-  // Hava durumunu çek (varsayılan: İstanbul koordinatları)
-  useEffect(() => {
-    const getWeatherData = async () => {
-      try {
-        const { data } = await api.get('/weather?lat=41.0082&lon=28.9784');
-        setWeather(data.weather);
-      } catch (err) {
-        console.log('Hava durumu alınamadı:', err.message);
-      }
-    };
-    getWeatherData();
-  }, []);
-
   // Dolabı çek
   useEffect(() => {
     api.get('/clothing')
@@ -204,7 +191,7 @@ export default function Outfit() {
         </div>
 
         <div className="brut-ob-top-left">
-          <WeatherWidget staticMode={true} />
+          <WeatherWidget staticMode={true} onWeatherSelect={setWeather} />
         </div>
         <div className="brut-ob-chat-section">
           

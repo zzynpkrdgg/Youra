@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import api from '../api/axios';
 import './WeatherWidget.css';
 
 // WMO Weather codes mapping
@@ -13,9 +14,10 @@ const getWeatherDetails = (code) => {
   return { icon: '🌡️', desc: 'BİLİNMİYOR' };
 };
 
-export default function WeatherWidget({ staticMode = false }) {
+export default function WeatherWidget({ staticMode = false, onWeatherSelect }) {
   const [expanded, setExpanded] = useState(false);
   const [weatherData, setWeatherData] = useState(null);
+  const [forecasts, setForecasts] = useState({});
 
   // Calendar states
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
@@ -23,43 +25,64 @@ export default function WeatherWidget({ staticMode = false }) {
   const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
-    // Gelecekte backend'den çekilecek verinin birebir simülasyonu
-    const mockApiResponse = {
-      "message": "Hava durumu getirildi",
-      "location": { "latitude": 39.9208, "longitude": 32.8541 },
-      "weather": {
-          "temperature": 16.9,
-          "windspeed": 12.7,
-          "weathercode": 95,
-          "time": "2026-05-21T14:00"
+    const fetchForecast = async () => {
+      try {
+        const { data } = await api.get('/weather/forecast?lat=41.0082&lon=28.9784&days=7');
+        const forecastMap = {};
+        let todayMs = new Date().setHours(0,0,0,0);
+        
+        data.forecast.forEach(day => {
+          const d = new Date(day.date);
+          d.setHours(0,0,0,0);
+          forecastMap[d.getTime()] = {
+            temperature: day.temperatureMax,
+            windspeed: day.windspeedMax,
+            weathercode: day.weathercode,
+            time: day.date
+          };
+        });
+
+        const currentRes = await api.get('/weather?lat=41.0082&lon=28.9784');
+        if (currentRes.data.weather) {
+            const today = new Date(currentRes.data.weather.time);
+            today.setHours(0,0,0,0);
+            todayMs = today.getTime();
+            forecastMap[todayMs] = currentRes.data.weather;
+        }
+
+        setForecasts(forecastMap);
+        
+        const initialDateMs = forecastMap[todayMs] ? todayMs : Object.keys(forecastMap)[0];
+        
+        setViewYear(new Date(Number(initialDateMs)).getFullYear());
+        setViewMonth(new Date(Number(initialDateMs)).getMonth());
+        
+        if (staticMode) {
+          setSelectedDate(Number(initialDateMs));
+        }
+        setWeatherData(forecastMap[initialDateMs]);
+        
+        if (onWeatherSelect && forecastMap[initialDateMs]) {
+          onWeatherSelect(forecastMap[initialDateMs]);
+        }
+        
+      } catch (err) {
+        console.error('Hava durumu alınamadı:', err);
       }
     };
-    
-    // API çağrısını simüle etmek için küçük bir gecikme eklenebilir ama anında yüklensin
-    setWeatherData(mockApiResponse.weather);
-    
-    // Takvim başlangıcını gelen veriye (veya bugüne) göre ayarla
-    const d = new Date(mockApiResponse.weather.time);
-    setViewYear(d.getFullYear());
-    setViewMonth(d.getMonth());
-    
-    // Kombin sayfasında (staticMode) varsayılan olarak bugünü seç
-    if (staticMode) {
-      const today = new Date(mockApiResponse.weather.time);
-      today.setHours(0,0,0,0);
-      setSelectedDate(today.getTime());
-    }
-  }, [staticMode]);
+    fetchForecast();
+  }, [staticMode, onWeatherSelect]);
 
   if (!weatherData) return null; // Veri yüklenene kadar boş
 
   // O anki tarihi 'bugün' olarak baz alıyoruz
-  const todayTime = new Date(weatherData.time);
+  const todayTime = new Date();
   todayTime.setHours(0,0,0,0);
   const todayMs = todayTime.getTime();
 
-  const dateStr = todayTime.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
-  const dayStr = todayTime.toLocaleDateString('tr-TR', { weekday: 'long' }).toUpperCase();
+  const selectedTime = new Date(weatherData.time);
+  const dateStr = selectedTime.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
+  const dayStr = selectedTime.toLocaleDateString('tr-TR', { weekday: 'long' }).toUpperCase();
   const temp = `${Math.round(weatherData.temperature)}°`;
   const windInfo = `RÜZGAR: ${weatherData.windspeed} km/s`;
   
@@ -143,10 +166,15 @@ export default function WeatherWidget({ staticMode = false }) {
               const dateTime = date.getTime();
               const isToday = dateTime === todayMs;
               const isPast = dateTime < todayMs;
+              
+              // Max limit is 6 days after today (total 7 days)
+              const maxDateMs = todayMs + (6 * 24 * 60 * 60 * 1000);
+              const isFutureLimit = dateTime > maxDateMs;
+              
               const isSelected = selectedDate === dateTime;
 
               let cls = 'cal-cell';
-              if (isPast) cls += ' cal-cell--past';
+              if (isPast || isFutureLimit) cls += ' cal-cell--past';
               else cls += ' cal-cell--selectable';
 
               if (isSelected) cls += ' cal-cell--selected';
@@ -154,8 +182,13 @@ export default function WeatherWidget({ staticMode = false }) {
 
               const handleClick = () => {
                 if (!staticMode) return; // Sadece kombin modunda gün seçilebilir
-                if (isPast) return;      // Geçmiş seçilemez
+                if (isPast || isFutureLimit) return; // Geçmiş veya 7 günden sonrası seçilemez
                 setSelectedDate(dateTime);
+                const w = forecasts[dateTime];
+                if (w) {
+                  setWeatherData(w);
+                  if (onWeatherSelect) onWeatherSelect(w);
+                }
               };
 
               return (
