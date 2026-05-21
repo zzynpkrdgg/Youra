@@ -7,7 +7,7 @@ exports.generateOutfit = async (req, res) => {
     if (!req.body) {
       return res.status(400).json({ error: 'Istek govdesi (body) eksik veya JSON formatinda degil.' });
     }
-    const { message, styles, wardrobe, items, mode } = req.body;
+    const { message, styles, wardrobe, items, mode, weather } = req.body;
 
     if (!wardrobe || !Array.isArray(wardrobe)) {
       return res.status(400).json({ error: 'wardrobe is required and must be an array' });
@@ -15,6 +15,42 @@ exports.generateOutfit = async (req, res) => {
 
     if (!process.env.GEMINI_API_KEY) {
       return res.status(500).json({ error: 'GEMINI_API_KEY is not configured in the environment' });
+    }
+
+    // Hava durumu açıklaması oluştur
+    let weatherDescription = '';
+    if (weather && weather.temperature !== undefined) {
+      const temp = weather.temperature;
+      const code = weather.weathercode;
+      
+      let weatherStatus = 'Açık hava';
+      let weatherAdvice = '';
+      
+      if (code === 0) {
+        weatherStatus = 'Açık ve güneşli';
+        weatherAdvice = 'Güneş ışınlarından koruna, sunglasses ve şapka kullan.';
+      } else if (code >= 1 && code <= 3) {
+        weatherStatus = 'Bulutlu';
+        weatherAdvice = 'Hafif bir dış giyim katar.';
+      } else if (code === 45 || code === 48) {
+        weatherStatus = 'Sisli';
+        weatherAdvice = 'Görünürlüğü artırmak için açık renkler tercih et.';
+      } else if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) {
+        weatherStatus = 'Yağmurlu';
+        weatherAdvice = '⚠️ Şemsiyeni ve su geçirmez ceketini almayı UNUTMA!';
+      } else if (code >= 71 && code <= 77) {
+        weatherStatus = 'Karlı';
+        weatherAdvice = '❄️ Kalın katlı giyim ve su geçirmez ayakkabı giyin!';
+      } else if (code === 85 || code === 86) {
+        weatherStatus = 'Karla karışık yağmur';
+        weatherAdvice = '⚠️ Su geçirmez, sıcak ve kalın giysiler gerekli!';
+      } else if (code >= 95 && code <= 99) {
+        weatherStatus = 'Fırtınalı';
+        weatherAdvice = '⚠️ GÜVENLI ve ağır giyimler öner! Dış giyime dikkat et.';
+      }
+      
+      weatherDescription = `\nHava Durumu: ${weatherStatus}, ${temp}°C
+${weatherAdvice}`;
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -29,23 +65,27 @@ exports.generateOutfit = async (req, res) => {
       style: w.style || w.season || ''
     }));
 
-    const systemPrompt = `Sen bir kişisel stil danışmanısın. Kullanıcının dijital gardırobunu analiz ederek en uygun kombinleri öneriyorsun.
+    const systemPrompt = `Sen profesyonel bir kişisel stil ve dijital gardırop asistanısın. Sadece kombin önerileri yapmak ve kullanıcının stiliyle ilgilenmek üzere programlandın.
 
 Kullanıcının tercih ettiği tarzlar: ${styles && styles.length > 0 ? styles.join(', ') : 'Belirtilmemiş'}
 
 Gardırobu şu kıyafetlerden oluşuyor (JSON listesi):
 ${JSON.stringify(simpleWardrobe, null, 2)}
 
-Lütfen çıktını SADECE aşağıdaki JSON formatında ver.
+KURALLAR:
+1. Çıktını SADECE JSON formatında ver. Başında veya sonunda markdown (\`\`\`json) KULLANMA.
+2. Açıklamanı (explanation) ÇOK KISA, net ve profesyonel tut (Maksimum 1-2 cümle). Kullanıcı seçtiğin kıyafetleri zaten ekranda görecek, o yüzden uzun uzun parçaları betimleme. Sadece kombinin genel uyumunu veya hissiyatını özetle.
+3. Eğer kullanıcı moda ve kombin dışında tamamen alakasız bir soru sorarsa (Örn: "Nasılsın?", "Hava nasıl?"), "suggested_outfit" dizisini BOŞ BIRAK ve "explanation" kısmına sadece şunu yaz: "Ben profesyonel bir stil asistanıyım. Sadece gardırobunuzla ilgili kombin oluşturma konusunda yardımcı olabilirim." Asla alakasız sohbetlere girme.
+
+Beklenen JSON Formatı:
 {
   "suggested_outfit": ["kıyafet_id_1", "kıyafet_id_2"],
-  "explanation": "Kombin açıklaması (Neden bu parçaları seçtin, nasıl tamamlıyor vb.)"
-}
-ÖNEMLİ: "suggested_outfit" dizisi sadece string ID'lerden (\`_id\`) oluşmalıdır. Açıklamanı samimi ve kısa tut. Markdown \`\`\`json tagi koymadan sadece JSON dön.`;
+  "explanation": "Kombin açıklaması veya uyarı mesajı"
+}`;
 
     const userPrompt = `Kullanıcının hali hazırda seçtiği parçalar: ${JSON.stringify(items || [])}
 Kullanıcının isteği: "${message || 'Bana rastgele güzel bir kombin öner.'}"
-Mod: ${mode === 'tamamla' ? 'Kullanıcının seçtiği parçalara dolaptan uygun parçalar ekleyerek tamamla.' : 'Dolaptan tamamen yeni, sıfırdan bir kombin oluştur.'}`;
+Mod: ${mode === 'tamamla' ? 'Kullanıcının seçtiği parçalara dolaptan uygun parçalar ekleyerek tamamla.' : 'Dolaptan tamamen yeni, sıfırdan bir kombin oluştur.'}${weatherDescription}`;
 
     const result = await model.generateContent([systemPrompt, userPrompt]);
     const responseText = result.response.text();

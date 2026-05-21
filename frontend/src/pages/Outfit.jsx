@@ -36,6 +36,20 @@ export default function Outfit() {
   const dragItemRef                 = useRef(null);
   const [showModal, setShowModal]   = useState(false);
   const [addLoading, setAddLoading] = useState(false);
+  const [weather, setWeather]       = useState(null);
+
+  // Hava durumunu çek (varsayılan: İstanbul koordinatları)
+  useEffect(() => {
+    const getWeatherData = async () => {
+      try {
+        const { data } = await api.get('/weather?lat=41.0082&lon=28.9784');
+        setWeather(data.weather);
+      } catch (err) {
+        console.log('Hava durumu alınamadı:', err.message);
+      }
+    };
+    getWeatherData();
+  }, []);
 
   // Dolabı çek
   useEffect(() => {
@@ -131,7 +145,8 @@ export default function Outfit() {
         mode:       currentMode,
         items:      outfitItems,
         styles,
-        wardrobe:   wardrobe
+        wardrobe:   wardrobe,
+        weather:    weather
       });
       
       const aiData = data.data;
@@ -294,7 +309,16 @@ export default function Outfit() {
         {/* RIGHT — Kombin Kanvası */}
         <div className="brut-ob-right">
           <div className="brut-ob-right-header">
-            <h2 className="brut-ob-panel-title">KANVAS</h2>
+            <h2 className="brut-ob-panel-title">
+              KANVAS
+              {weather && weather.weathercode !== undefined && (
+                ((weather.weathercode >= 51 && weather.weathercode <= 67) || 
+                 (weather.weathercode >= 80 && weather.weathercode <= 82) ||
+                 (weather.weathercode >= 95 && weather.weathercode <= 99))
+              ) && (
+                <span style={{ marginLeft: 10, fontSize: '1.2rem' }} title="Hava yağmurlu! Kombinine şemsiye veya uygun bir dış giyim eklemeyi unutma.">☔</span>
+              )}
+            </h2>
             {outfitItems.length > 0 && (
               <button className="brut-ob-clear-btn" onClick={clearOutfit}>TEMİZLE</button>
             )}
