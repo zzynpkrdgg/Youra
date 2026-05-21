@@ -30,7 +30,7 @@ export default function Wardrobe() {
     setLoading(true);
     try {
       const { data } = await api.get('/clothing');
-      setItems(data);
+      setItems(data.clothes || []);
     } catch {
       setItems(DEMO_ITEMS);
     } finally {
@@ -43,7 +43,14 @@ export default function Wardrobe() {
   const handleAdd = async (form) => {
     setAddLoading(true);
     try {
-      const { data } = await api.post('/clothing', form);
+      const payload = {
+        image: form.imageUrl || 'https://via.placeholder.com/200',
+        category: form.category,
+        color: form.color,
+        style: form.name,
+        season: form.season,
+      };
+      const { data } = await api.post('/clothing', payload);
       setItems(prev => [data, ...prev]);
       setShowModal(false);
     } catch (err) {

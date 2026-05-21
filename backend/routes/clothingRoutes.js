@@ -7,7 +7,8 @@ const {
     getMyClothes,
     uploadClothing,
     deleteClothing,
-    updateClothing
+    updateClothing,
+    updateClothingStatus
 } = require("../controllers/clothingController")
 
 const { protect } = require("../middleware/authMiddleware")
@@ -20,6 +21,7 @@ router.post('/analyze', protect, analyzeClothing);
 router.post("/", protect, addClothing)
 router.get("/", protect, getMyClothes)
 router.post("/upload", protect, upload.single("image"), uploadClothing)
+router.patch("/:id/status", protect, updateClothingStatus)
 router.delete("/:id", protect, deleteClothing)
 router.put("/:id", protect, updateClothing)
 

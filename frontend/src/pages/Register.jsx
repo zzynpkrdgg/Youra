@@ -28,7 +28,8 @@ export default function Register() {
       await register(form.name, form.email, form.password);
       navigate('/onboarding');
     } catch (err) {
-      setError(err.response?.data?.message ?? 'Kayıt başarısız. Tekrar deneyin.');
+      console.error('Registration error:', err);
+      setError(err.response?.data?.message || err.message || 'Kayıt başarısız. Tekrar deneyin.');
     } finally {
       setLoading(false);
     }

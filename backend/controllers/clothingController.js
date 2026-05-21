@@ -1,5 +1,5 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const Clothing = require("../models/Clothing")
+const Clothing = require("../models/clothing")
 const supabase = require("../config/supabase")
 
 exports.analyzeClothing = async (req, res) => {
@@ -148,9 +148,23 @@ exports.uploadClothing = async (req, res) => {
 
 exports.getMyClothes = async (req, res) => {
     try {
-        const clothes = await Clothing.find({
+        const { status } = req.query
+
+        const filter = {
             user: req.user._id
-        }).sort({ createdAt: -1 })
+        }
+
+        if (status) {
+            if (!["available", "dirty"].includes(status)) {
+                return res.status(400).json({
+                    message: "Geçersiz status değeri. available veya dirty olmalıdır."
+                })
+            }
+
+            filter.status = status
+        }
+
+        const clothes = await Clothing.find(filter).sort({ createdAt: -1 })
 
         res.status(200).json({
             message: "Kıyafetler getirildi",
@@ -244,6 +258,49 @@ exports.updateClothing = async (req, res) => {
 
         res.status(200).json({
             message: "Kıyafet güncellendi",
+            clothing: updatedClothing
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Sunucu hatası",
+            error: error.message
+        })
+    }
+}
+
+exports.updateClothingStatus = async (req, res) => {
+    try {
+        const { status } = req.body
+
+        if (!status || !["available", "dirty"].includes(status)) {
+            return res.status(400).json({
+                message: "Status değeri available veya dirty olmalıdır"
+            })
+        }
+
+        const clothing = await Clothing.findById(req.params.id)
+
+        if (!clothing) {
+            return res.status(404).json({
+                message: "Kıyafet bulunamadı"
+            })
+        }
+
+        if (clothing.user.toString() !== req.user._id.toString()) {
+            return res.status(401).json({
+                message: "Yetkisiz işlem"
+            })
+        }
+
+        clothing.status = status
+
+        const updatedClothing = await clothing.save()
+
+        res.status(200).json({
+            message: status === "dirty"
+                ? "Kıyafet kirli sepetine taşındı"
+                : "Kıyafet tekrar kullanıma hazır",
             clothing: updatedClothing
         })
 
