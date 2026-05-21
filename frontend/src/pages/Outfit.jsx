@@ -48,9 +48,31 @@ export default function Outfit() {
   const handleAdd = async (form) => {
     setAddLoading(true);
     try {
-      const { data } = await api.post('/clothing', form);
-      // Yeni eklenen kıyafeti wardrobe state'ine ekle
-      setWardrobe(prev => [data, ...prev]);
+      let newItem = null;
+      if (form.file) {
+        const formData = new FormData();
+        formData.append('image', form.file);
+        formData.append('category', form.category);
+        formData.append('color', form.color);
+        formData.append('style', form.name);
+        formData.append('season', form.season);
+        
+        const { data } = await api.post('/clothing/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        newItem = data.clothing;
+      } else {
+        const payload = {
+          image: form.imageUrl || 'https://via.placeholder.com/200',
+          category: form.category,
+          color: form.color,
+          style: form.name,
+          season: form.season,
+        };
+        const { data } = await api.post('/clothing', payload);
+        newItem = data.clothing || data;
+      }
+      setWardrobe(prev => [newItem, ...prev]);
       setShowModal(false);
     } catch (err) {
       alert(err.response?.data?.message ?? 'Eklenemedi.');
@@ -211,10 +233,14 @@ export default function Outfit() {
               >
                 <div
                   className="brut-ob-mini-thumb"
-                  style={{ background: `linear-gradient(135deg, ${item.color}44, ${item.color}11)` }}
-                />
+                  style={!(item.image || item.imageUrl) ? { background: `linear-gradient(135deg, ${item.color}44, ${item.color}11)` } : {}}
+                >
+                  {(item.image || item.imageUrl) && (
+                    <img src={item.image || item.imageUrl} alt={item.style || item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  )}
+                </div>
                 <div className="brut-ob-mini-info">
-                  <span className="brut-ob-mini-name">{item.name}</span>
+                  <span className="brut-ob-mini-name">{item.style || item.name}</span>
                 </div>
               </div>
             ))}
@@ -250,9 +276,13 @@ export default function Outfit() {
                       <div key={item._id} className="brut-ob-canvas-item animate-fadein">
                         <div
                           className="brut-ob-canvas-thumb"
-                          style={{ background: `linear-gradient(135deg, ${item.color}55, ${item.color}22)` }}
-                        />
-                        <span className="brut-ob-canvas-name">{item.name}</span>
+                          style={!(item.image || item.imageUrl) ? { background: `linear-gradient(135deg, ${item.color}55, ${item.color}22)` } : {}}
+                        >
+                          {(item.image || item.imageUrl) && (
+                            <img src={item.image || item.imageUrl} alt={item.style || item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                          )}
+                        </div>
+                        <span className="brut-ob-canvas-name">{item.style || item.name}</span>
                         <button
                           className="brut-ob-canvas-remove"
                           onClick={() => removeFromOutfit(item._id)}

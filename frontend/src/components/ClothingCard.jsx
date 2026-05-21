@@ -27,13 +27,21 @@ export default function ClothingCard({ item, onDelete, onEdit }) {
       {/* Görsel ya da renk placeholder */}
       <div
         className="clothing-card-img"
-        style={{
-          background: item.imageUrl
-            ? `url(${item.imageUrl}) center/cover no-repeat`
-            : `linear-gradient(135deg, ${item.color ?? '#8b5cf6'}22, ${item.color ?? '#ec4899'}44)`,
-        }}
+        style={
+          !(item.image || item.imageUrl)
+            ? { background: `linear-gradient(135deg, ${item.color ?? '#8b5cf6'}22, ${item.color ?? '#ec4899'}44)` }
+            : {}
+        }
       >
-        {!item.imageUrl && icon && <span className="clothing-card-emoji">{icon}</span>}
+        {(item.image || item.imageUrl) ? (
+          <img 
+            src={item.image || item.imageUrl} 
+            alt={item.style || item.name} 
+            style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 }} 
+          />
+        ) : (
+          icon && <span className="clothing-card-emoji">{icon}</span>
+        )}
         {item.color && (
           <span
             className="clothing-color-dot"
@@ -46,7 +54,7 @@ export default function ClothingCard({ item, onDelete, onEdit }) {
       {/* İçerik */}
       <div className="clothing-card-body">
         <div className="clothing-card-header">
-          <h3 className="clothing-card-name">{item.name}</h3>
+          <h3 className="clothing-card-name">{item.style || item.name}</h3>
           {item.season && item.season !== 'Tümü' && (
             <span className="clothing-card-season">{item.season}</span>
           )}

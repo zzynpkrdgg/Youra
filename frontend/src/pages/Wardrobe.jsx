@@ -42,15 +42,31 @@ export default function Wardrobe() {
   const handleAdd = async (form) => {
     setAddLoading(true);
     try {
-      const payload = {
-        image: form.imageUrl || 'https://via.placeholder.com/200',
-        category: form.category,
-        color: form.color,
-        style: form.name,
-        season: form.season,
-      };
-      const { data } = await api.post('/clothing', payload);
-      setItems(prev => [data, ...prev]);
+      let newItem = null;
+      if (form.file) {
+        const formData = new FormData();
+        formData.append('image', form.file);
+        formData.append('category', form.category);
+        formData.append('color', form.color);
+        formData.append('style', form.name);
+        formData.append('season', form.season);
+        
+        const { data } = await api.post('/clothing/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        newItem = data.clothing;
+      } else {
+        const payload = {
+          image: form.imageUrl || 'https://via.placeholder.com/200',
+          category: form.category,
+          color: form.color,
+          style: form.name,
+          season: form.season,
+        };
+        const { data } = await api.post('/clothing', payload);
+        newItem = data.clothing || data;
+      }
+      setItems(prev => [newItem, ...prev]);
       setShowModal(false);
     } catch (err) {
       alert(err.response?.data?.message ?? 'Eklenemedi.');
@@ -73,7 +89,8 @@ export default function Wardrobe() {
   const filtered = items.filter(item => {
     const matchCat = filterCat === 'Tümü' || item.category === filterCat;
     const matchSea = filterSea === 'Mevsim' || filterSea === 'Tümü' || item.season === filterSea;
-    const matchQ   = !search || item.name.toLowerCase().includes(search.toLowerCase())
+    const itemName = item.style || item.name || '';
+    const matchQ   = !search || itemName.toLowerCase().includes(search.toLowerCase())
                              || item.brand?.toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSea && matchQ;
   });
@@ -130,7 +147,7 @@ export default function Wardrobe() {
             value={filterSea}
             onChange={e => setFilterSea(e.target.value)}
           >
-            {SEASONS.map(s => <option key={s}>{s.toUpperCase()}</option>)}
+            {SEASONS.map(s => <option key={s} value={s}>{s.toUpperCase()}</option>)}
           </select>
         </div>
 
