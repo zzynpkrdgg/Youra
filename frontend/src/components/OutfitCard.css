@@ -1,0 +1,140 @@
+/* OutfitCard — Brutalist, 1px border */
+.outfit-card {
+  border: 1px solid var(--color-text);
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+
+.outfit-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 3px 3px 0 var(--color-text);
+}
+
+/* === SAĞ ÜST: ikon butonlar (ClothingCard ile aynı .card-icon-btn) === */
+.outfit-card-top-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 5px;
+  z-index: 10;
+}
+
+/* Favorili yıldız: sadece karakter değişir, arka plan DEĞİŞMEZ */
+.card-icon-btn--favorited {
+  /* arka plan beyaz kalır, sadece yıldız karakteri ★ (dolu) olur */
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* === HEADER === */
+.outfit-card-header {
+  padding: 12px 14px 8px;
+  border-bottom: 1px solid var(--color-text);
+  padding-right: 68px; /* ikon butonlarla çakışmaması için */
+}
+
+.outfit-card-title-area {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.outfit-card-name {
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.outfit-card-style {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  border: 1px solid var(--color-text);
+  padding: 2px 6px;
+  width: fit-content;
+}
+
+/* === KIYAFETLERİN KÜÇÜK KARELERİ === */
+.outfit-card-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-text);
+  min-height: 56px;
+}
+
+.outfit-card-thumb {
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--color-text);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.outfit-card-thumb-label {
+  font-size: 7px;
+  font-weight: 900;
+  color: var(--color-text);
+  text-transform: uppercase;
+  background: var(--color-bg);
+  padding: 1px 2px;
+  width: 100%;
+  text-align: center;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* === NOT === */
+.outfit-card-notes {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-2);
+  margin: 0;
+  padding: 8px 12px;
+  line-height: 1.5;
+  border-bottom: 1px solid var(--color-text);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* === ALT: tarih + sil — margin-top: auto ile her zaman alta sabitlenir === */
+.outfit-card-footer {
+  margin-top: auto;
+  padding: 8px 12px 10px;
+  border-top: 1px solid var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.outfit-card-date {
+  font-size: 9px;
+  font-weight: 900;
+  color: var(--color-text-2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.card-delete-btn {
+  font-size: 10px;
+  padding: 5px 14px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}

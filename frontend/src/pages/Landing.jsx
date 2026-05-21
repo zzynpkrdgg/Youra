@@ -68,10 +68,12 @@ export default function Landing({ initialForm = null }) {
       <div className="auth-split">
         <div className="auth-left">
           <div className="hero-content" style={{ position: 'relative' }}>
-            {/* Sol taraftan kısaltmak için left oranını artırıp minWidth'i düşürüyoruz */}
-            <div style={{ position: 'absolute', top: '0', left: '130%', minWidth: '550px', zIndex: 50 }}>
-              <WeatherWidget />
-            </div>
+            {/* Hava durumu aracı sadece kullanıcı giriş yaptıysa görünsün */}
+            {user && (
+              <div style={{ position: 'absolute', top: '0', left: '130%', minWidth: '550px', zIndex: 50 }}>
+                <WeatherWidget />
+              </div>
+            )}
 
             <p className="hero-desc" style={{ marginBottom: '40px' }}>
               Yapay zeka stil asistanınla dolabındaki her parçayı yeniden keşfet. Modanın sınırlarını zorlayan benzersiz kombinlerle kendi tarzını yarat ve her an göz alıcı ol.

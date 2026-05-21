@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import Navbar   from './components/Navbar';
-import Landing  from './pages/Landing';
-import Login    from './pages/Login';
-import Register from './pages/Register';
-import Wardrobe from './pages/Wardrobe';
-import Outfit   from './pages/Outfit';
-import Profile  from './pages/Profile';
+import Navbar        from './components/Navbar';
+import Landing       from './pages/Landing';
+import Login         from './pages/Login';
+import Register      from './pages/Register';
+import Wardrobe      from './pages/Wardrobe';
+import Outfit        from './pages/Outfit';
+import MyOutfits     from './pages/MyOutfits';
+import Profile       from './pages/Profile';
 import StyleOnboarding from './pages/StyleOnboarding';
 
 // Protected route wrapper
@@ -50,7 +51,11 @@ function AppRoutes() {
           <ProtectedRoute><Wardrobe /></ProtectedRoute>
         } />
 
-        <Route path="/outfit" element={
+        <Route path="/myoutfits" element={
+          <ProtectedRoute><MyOutfits /></ProtectedRoute>
+        } />
+
+        <Route path="/create" element={
           <ProtectedRoute><Outfit /></ProtectedRoute>
         } />
 

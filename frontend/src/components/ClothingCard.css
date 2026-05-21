@@ -1,7 +1,7 @@
 /* ── Brutalist Clothing Card ───────────────────────────────── */
 .clothing-card {
   background: var(--color-bg);
-  border: 2px solid var(--color-text);
+  border: 1px solid var(--color-text);
   overflow: hidden;
   position: relative;
   display: flex;
@@ -10,8 +10,46 @@
 }
 
 .clothing-card:hover {
-  transform: translate(-4px, -4px);
-  box-shadow: 4px 4px 0 var(--color-text);
+  transform: translate(-3px, -3px);
+  box-shadow: 3px 3px 0 var(--color-text);
+}
+
+/* Sağ üst ikon butonlar */
+.clothing-card-top-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 5px;
+  z-index: 10;
+}
+
+/* Ortak ikon buton stili — OutfitCard ile aynı */
+.card-icon-btn {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--color-text);
+  background: var(--color-bg);
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 1;
+  transition: background 0.1s, color 0.1s, transform 0.1s;
+}
+
+.card-icon-btn:hover {
+  background: var(--color-text);
+  color: var(--color-bg);
+  transform: translate(-1px, -1px);
+}
+
+/* Kirli sepeti aktifken sadece arka plan değişsin */
+.card-icon-btn--active {
+  background: var(--color-text);
+  color: var(--color-bg);
 }
 
 /* Image area */
@@ -23,7 +61,7 @@
   justify-content: center;
   position: relative;
   background: var(--color-bg-3);
-  border-bottom: 2px solid var(--color-text);
+  border-bottom: 1px solid var(--color-text);
 }
 
 .clothing-card-emoji {
@@ -34,9 +72,9 @@
   position: absolute;
   bottom: var(--space-2);
   right: var(--space-2);
-  width: 16px;
-  height: 16px;
-  border: 2px solid var(--color-text);
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--color-text);
 }
 
 /* Body */
@@ -95,34 +133,17 @@
   color: var(--color-text);
 }
 
-/* Actions (revealed on hover) */
-.clothing-card-actions {
+/* Alt: SİL butonu — her zaman sabit */
+.clothing-card-footer {
+  padding: 8px 12px 10px;
+  border-top: 1px solid var(--color-text);
   display: flex;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3) var(--space-3);
-  background: var(--color-bg);
-  border-top: 2px solid var(--color-text);
+  justify-content: flex-end;
 }
 
-.clothing-card-actions button {
-  flex: 1;
-  border: 2px solid var(--color-text);
-  background: transparent;
-  color: var(--color-text);
-  font-family: var(--font-sans);
-  font-weight: 700;
-  text-transform: uppercase;
+.card-delete-btn {
+  font-size: 10px;
+  padding: 5px 14px;
+  letter-spacing: 0.08em;
   cursor: pointer;
-  padding: var(--space-1);
-  border-radius: 0;
-  box-shadow: 0px 0px 0 var(--color-text);
-  transform: translate(0, 0);
-  transition: transform 0.1s linear, box-shadow 0.1s linear, background 0.1s, color 0.1s;
-}
-
-.clothing-card-actions button:hover {
-  background: var(--color-text);
-  color: var(--color-bg);
-  box-shadow: 3px 3px 0 var(--color-text);
-  transform: translate(-3px, -3px);
 }

@@ -23,6 +23,7 @@ export default function Wardrobe() {
   const [filterCat, setFilterCat]   = useState('Tümü');
   const [filterSea, setFilterSea]   = useState('Mevsim');
   const [search, setSearch]         = useState('');
+  const [showDirty, setShowDirty]   = useState(false);
   const [error, setError]           = useState('');
 
   const fetchItems = useCallback(async () => {
@@ -62,13 +63,25 @@ export default function Wardrobe() {
     }
   };
 
+  const handleToggleDirty = async (id) => {
+    // Backend bağlı değilken state'te güncelle
+    setItems(prev => prev.map(item => 
+      item._id === id ? { ...item, isDirty: !item.isDirty } : item
+    ));
+    // Gerçek uygulamada api.patch çağrılır
+  };
+
   // Filter & search
   const filtered = items.filter(item => {
     const matchCat = filterCat === 'Tümü' || item.category === filterCat;
     const matchSea = filterSea === 'Mevsim' || filterSea === 'Tümü' || item.season === filterSea;
     const matchQ   = !search || item.name.toLowerCase().includes(search.toLowerCase())
                              || item.brand?.toLowerCase().includes(search.toLowerCase());
-    return matchCat && matchSea && matchQ;
+    
+    // showDirty false ise isDirty: true olanları gizle
+    const matchDirty = showDirty || !item.isDirty;
+    
+    return matchCat && matchSea && matchQ && matchDirty;
   });
 
   return (
@@ -94,9 +107,25 @@ export default function Wardrobe() {
             </div>
             <div className="brut-thick-line" />
           </div>
-          <button className="btn-sharp btn-sharp--white brut-add-btn" onClick={() => setShowModal(true)}>
-            KIYAFET EKLE
-          </button>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }} onClick={() => setShowDirty(!showDirty)}>
+              <span style={{ fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', color: 'var(--color-text)' }}>
+                Kirlileri Göster
+              </span>
+              <div style={{
+                width: '24px', height: '24px', backgroundColor: 'var(--color-bg)', border: '2px solid var(--color-text)', 
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '2px 2px 0 var(--color-text)'
+              }}>
+                {showDirty && <span style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--color-text)', lineHeight: 1 }}>✓</span>}
+              </div>
+            </div>
+
+            <button className="btn-sharp btn-sharp--white brut-add-btn" onClick={() => setShowModal(true)}>
+              KIYAFET EKLE
+            </button>
+          </div>
         </div>
 
         {/* Brutalist Filter Bar */}
@@ -148,6 +177,7 @@ export default function Wardrobe() {
                   key={item._id}
                   item={item}
                   onDelete={handleDelete}
+                  onToggleDirty={handleToggleDirty}
                 />
               ))}
             </div>

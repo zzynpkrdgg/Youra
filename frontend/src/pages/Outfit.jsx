@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import api from '../api/axios';
 import AddClothingModal from '../components/AddClothingModal';
+import SaveOutfitModal from '../components/SaveOutfitModal';
 import WeatherWidget from '../components/WeatherWidget';
 import './Outfit.css';
 
@@ -34,8 +35,9 @@ export default function Outfit() {
   const [generating, setGenerating] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const dragItemRef                 = useRef(null);
-  const [showModal, setShowModal]   = useState(false);
-  const [addLoading, setAddLoading] = useState(false);
+  const [showModal, setShowModal]         = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [addLoading, setAddLoading]       = useState(false);
 
   // Dolabı çek
   useEffect(() => {
@@ -89,6 +91,19 @@ export default function Outfit() {
     setOutfitItems(prev => prev.filter(i => i._id !== id));
 
   const clearOutfit = () => setOutfitItems([]);
+
+  // Kombini localStorage'a kaydet
+  const handleSaveOutfit = (form) => {
+    const saved = JSON.parse(localStorage.getItem('youra_outfits') || '[]');
+    const newOutfit = {
+      id: Date.now().toString(),
+      ...form,
+    };
+    const updated = [newOutfit, ...saved];
+    localStorage.setItem('youra_outfits', JSON.stringify(updated));
+    setShowSaveModal(false);
+    alert(`"${form.name}" başarıyla kaydedildi!`);
+  };
 
   // AI Kombin oluştur
   const handleGenerate = useCallback(async () => {
@@ -269,9 +284,23 @@ export default function Outfit() {
         <div className="brut-ob-right">
           <div className="brut-ob-right-header">
             <h2 className="brut-ob-panel-title">KANVAS</h2>
-            {outfitItems.length > 0 && (
-              <button className="brut-ob-clear-btn" onClick={clearOutfit}>TEMİZLE</button>
-            )}
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <button
+                className="brut-ob-clear-btn"
+                onClick={clearOutfit}
+                style={{ visibility: outfitItems.length > 0 ? 'visible' : 'hidden' }}
+              >
+                TEMİZLE
+              </button>
+              <button
+                className="brut-ob-save-btn"
+                onClick={() => setShowSaveModal(true)}
+                disabled={outfitItems.length === 0}
+                title={outfitItems.length === 0 ? 'Önce kıyafet ekle' : 'Kombini Kaydet'}
+              >
+                KOMBİNİ KAYDET
+              </button>
+            </div>
           </div>
 
           <div
@@ -314,12 +343,21 @@ export default function Outfit() {
 
 
 
-      {/* Add Modal */}
+      {/* Add Clothing Modal */}
       {showModal && (
         <AddClothingModal
           onClose={() => setShowModal(false)}
           onSubmit={handleAdd}
           loading={addLoading}
+        />
+      )}
+
+      {/* Save Outfit Modal */}
+      {showSaveModal && (
+        <SaveOutfitModal
+          onClose={() => setShowSaveModal(false)}
+          onSubmit={handleSaveOutfit}
+          outfitItems={outfitItems}
         />
       )}
 
