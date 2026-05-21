@@ -1,0 +1,126 @@
+/* MyOutfits Page — Wardrobe ile aynı Brutalist düzen */
+@import './Wardrobe.css';
+
+/* Background Marquee — Wardrobe'dan farklı animasyon adı */
+.myoutfits-bg-marquee {
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100vh;
+  width: 15vw;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+}
+.myoutfits-bg-marquee-content {
+  display: flex;
+  flex-direction: column;
+  animation: scrollMyOutfitsMarquee 200s linear infinite;
+}
+.myoutfits-bg-marquee span {
+  font-size: 20vw;
+  font-weight: 900;
+  color: var(--color-text);
+  line-height: 0.8;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  letter-spacing: -20px;
+  white-space: nowrap;
+  opacity: 0.04;
+}
+@keyframes scrollMyOutfitsMarquee {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+.myoutfits-wrapper {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.myoutfits-inner {
+  padding: var(--space-8) 4vw var(--space-16);
+  max-width: 1600px;
+  margin: 0 auto;
+  font-family: var(--font-sans);
+  position: relative;
+  z-index: 1;
+}
+
+.myoutfits-content-overlay {
+  position: relative;
+  z-index: 10;
+}
+
+/* Arama çubuğu — hafif daha dar */
+.myoutfits-wrapper .brut-search {
+  width: 28%;
+  flex: none;
+}
+
+/* Sekmeler — kalan alanı eşit böl */
+.myoutfits-wrapper .brut-filter-tabs {
+  border-right: none;
+}
+
+.myoutfits-wrapper .brut-tab {
+  font-size: 11.5px;
+  padding: 0 10px;
+  flex: 1 1 0; /* Kalan boşluğu eşit bölüştür */
+}
+
+/* Kombin grid */
+.myoutfits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-4);
+}
+
+/* Sort butonu — başlık satırının sağında */
+.myoutfits-sort-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-end;         /* brut-top-section alt kenarına hizala */
+  background: var(--color-bg);
+  border: 2px solid var(--color-text);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  padding: 6px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 3px 3px 0 var(--color-text);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.myoutfits-sort-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--color-text);
+}
+.myoutfits-sort-arrow {
+  font-size: 14px;
+  font-weight: 900;
+}
+
+/* Boş durum */
+.myoutfits-empty {
+  text-align: center;
+  padding: var(--space-20) var(--space-8);
+  font-family: var(--font-sans);
+  color: var(--color-text);
+}
+.myoutfits-empty h2 {
+  font-size: var(--text-2xl);
+  font-weight: 900;
+  margin-bottom: var(--space-3);
+}
+.myoutfits-empty p {
+  color: var(--color-text-2);
+  font-size: var(--text-sm);
+}

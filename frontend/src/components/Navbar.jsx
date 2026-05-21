@@ -4,8 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
 const NAV_LINKS = [
-  { to: '/wardrobe', label: 'Dolabım' },
-  { to: '/outfit',   label: 'Kombin' },
+  { to: '/wardrobe',   label: 'Dolabım' },
+  { to: '/myoutfits',  label: 'Kombinlerim' },
+  { to: '/create',     label: 'Kombin Oluştur' },
 ];
 
 export default function Navbar() {

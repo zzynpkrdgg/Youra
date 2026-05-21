@@ -1,3 +1,5 @@
+import { useState, useEffect, useRef } from 'react';
+import ConfirmDialog from './ConfirmDialog';
 import './ClothingCard.css';
 
 const CATEGORY_ICONS = {
@@ -18,13 +20,48 @@ const SEASON_COLORS = {
   'Tüm Mevsimler': '#8b5cf6',
 };
 
-export default function ClothingCard({ item, onDelete, onEdit }) {
+export default function ClothingCard({ item, onDelete, onEdit, onToggleDirty }) {
+  const [showConfirm, setShowConfirm] = useState(false);
+  const confirmRef = useRef(null);
   const icon        = CATEGORY_ICONS[item.category] ?? '';
   const seasonColor = SEASON_COLORS[item.season]    ?? '#a09db8';
 
+  // Başka bir interaktif elemana tıklanınca kapat (boş ekrana tıklamada kapanmasın)
+  useEffect(() => {
+    if (!showConfirm) return;
+    const handler = (e) => {
+      const isInteractive = e.target.closest('button, a, input, select, [role="button"]');
+      const isInsideConfirm = confirmRef.current?.contains(e.target);
+      if (isInteractive && !isInsideConfirm) {
+        setShowConfirm(false);
+      }
+    };
+    document.addEventListener('mousedown', handler, true);
+    return () => document.removeEventListener('mousedown', handler, true);
+  }, [showConfirm]);
+
   return (
     <div className="clothing-card animate-fadein">
-      {/* Görsel ya da renk placeholder */}
+
+      {/* Sağ üst: Düzenle + Kirli Sepeti */}
+      <div className="clothing-card-top-actions">
+        <button
+          className="card-icon-btn"
+          title="Düzenle"
+          onClick={(e) => { e.stopPropagation(); if (onEdit) onEdit(item); }}
+        >
+          ✏
+        </button>
+        <button
+          className={`card-icon-btn ${item.isDirty ? 'card-icon-btn--active' : ''}`}
+          title={item.isDirty ? 'Temizlendi İşaretle' : 'Kirli Sepetine At'}
+          onClick={(e) => { e.stopPropagation(); if (onToggleDirty) onToggleDirty(item._id); }}
+        >
+          🧺
+        </button>
+      </div>
+
+      {/* Görsel */}
       <div
         className="clothing-card-img"
         style={
@@ -71,27 +108,24 @@ export default function ClothingCard({ item, onDelete, onEdit }) {
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="clothing-card-actions">
-        {onEdit && (
-          <button
-            className="btn btn-ghost btn-sm"
-            onClick={() => onEdit(item)}
-            title="Düzenle"
-          >
-            Düzenle
-          </button>
-        )}
-        {onDelete && (
-          <button
-            className="btn btn-danger btn-sm"
-            onClick={() => onDelete(item._id)}
-            title="Sil"
-          >
-            Sil
-          </button>
-        )}
+      {/* Alt: SİL butonu — her zaman sabit */}
+      <div className="clothing-card-footer">
+        <button
+          className="card-delete-btn btn-sharp btn-sharp--black"
+          onClick={() => setShowConfirm(true)}
+        >
+          SİL
+        </button>
       </div>
+
+      {/* Onay Diyaloğu */}
+      {showConfirm && (
+        <ConfirmDialog
+          message="Bu kıyafeti silmek istediğine emin misin?"
+          onCancel={() => setShowConfirm(false)}
+          onConfirm={() => { setShowConfirm(false); if (onDelete) onDelete(item._id); }}
+        />
+      )}
     </div>
   );
 }

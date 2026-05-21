@@ -236,6 +236,31 @@
   color: var(--color-bg);
 }
 
+.brut-ob-save-btn {
+  background: var(--color-text);
+  color: var(--color-bg);
+  border: 2px solid var(--color-text);
+  font-family: var(--font-sans);
+  font-weight: 900;
+  padding: var(--space-1) var(--space-3);
+  cursor: pointer;
+  transition: all 0.1s;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+}
+
+.brut-ob-save-btn:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+}
+
+.brut-ob-save-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 .brut-ob-canvas {
   width: 100%;
   aspect-ratio: 1;

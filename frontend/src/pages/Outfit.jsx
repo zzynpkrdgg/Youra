@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import api from '../api/axios';
 import AddClothingModal from '../components/AddClothingModal';
+import SaveOutfitModal from '../components/SaveOutfitModal';
 import WeatherWidget from '../components/WeatherWidget';
 import './Outfit.css';
 
@@ -34,9 +35,23 @@ export default function Outfit() {
   const [generating, setGenerating] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const dragItemRef                 = useRef(null);
-  const [showModal, setShowModal]   = useState(false);
-  const [addLoading, setAddLoading] = useState(false);
-  const [weather, setWeather]       = useState(null);
+  const [showModal, setShowModal]         = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [addLoading, setAddLoading]       = useState(false);
+  const [weather, setWeather]             = useState(null);
+
+  // Hava durumunu çek (varsayılan: İstanbul koordinatları)
+  useEffect(() => {
+    const getWeatherData = async () => {
+      try {
+        const { data } = await api.get('/weather?lat=41.0082&lon=28.9784');
+        setWeather(data.weather);
+      } catch (err) {
+        console.log('Hava durumu alınamadı:', err.message);
+      }
+    };
+    getWeatherData();
+  }, []);
 
   // Dolabı çek
   useEffect(() => {
@@ -112,6 +127,19 @@ export default function Outfit() {
     setOutfitItems(prev => prev.filter(i => i._id !== id));
 
   const clearOutfit = () => setOutfitItems([]);
+
+  // Kombini localStorage'a kaydet
+  const handleSaveOutfit = (form) => {
+    const saved = JSON.parse(localStorage.getItem('youra_outfits') || '[]');
+    const newOutfit = {
+      id: Date.now().toString(),
+      ...form,
+    };
+    const updated = [newOutfit, ...saved];
+    localStorage.setItem('youra_outfits', JSON.stringify(updated));
+    setShowSaveModal(false);
+    alert(`"${form.name}" başarıyla kaydedildi!`);
+  };
 
   // AI Kombin oluştur
   const handleGenerate = useCallback(async () => {
@@ -306,9 +334,19 @@ export default function Outfit() {
                 <span style={{ marginLeft: 10, fontSize: '1.2rem' }} title="Hava yağmurlu! Kombinine şemsiye veya uygun bir dış giyim eklemeyi unutma.">☔</span>
               )}
             </h2>
-            {outfitItems.length > 0 && (
-              <button className="brut-ob-clear-btn" onClick={clearOutfit}>TEMİZLE</button>
-            )}
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              {outfitItems.length > 0 && (
+                <button className="brut-ob-clear-btn" onClick={clearOutfit}>TEMİZLE</button>
+              )}
+              <button
+                className="brut-ob-save-btn"
+                onClick={() => setShowSaveModal(true)}
+                disabled={outfitItems.length === 0}
+                title={outfitItems.length === 0 ? 'Önce kıyafet ekle' : 'Kombini Kaydet'}
+              >
+                KOMBİNİ KAYDET
+              </button>
+            </div>
           </div>
 
           <div
@@ -355,12 +393,21 @@ export default function Outfit() {
 
 
 
-      {/* Add Modal */}
+      {/* Add Clothing Modal */}
       {showModal && (
         <AddClothingModal
           onClose={() => setShowModal(false)}
           onSubmit={handleAdd}
           loading={addLoading}
+        />
+      )}
+
+      {/* Save Outfit Modal */}
+      {showSaveModal && (
+        <SaveOutfitModal
+          onClose={() => setShowSaveModal(false)}
+          onSubmit={handleSaveOutfit}
+          outfitItems={outfitItems}
         />
       )}
 
