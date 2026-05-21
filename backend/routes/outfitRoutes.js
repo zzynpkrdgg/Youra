@@ -1,7 +1,9 @@
-const express = require("express")
-const router = express.Router()
+const express = require('express');
+const router = express.Router();
 
 const {
+    generateOutfit,
+    chatOutfit,
     createOutfit,
     getMyOutfits,
     deleteOutfit
@@ -9,10 +11,13 @@ const {
 
 const { protect } = require("../middleware/authMiddleware")
 
+// AI rotaları
+router.post('/generate', protect, generateOutfit);
+router.post('/chat', protect, chatOutfit);
+
+// DB rotaları
 router.post("/", protect, createOutfit)
-
 router.get("/", protect, getMyOutfits)
-
 router.delete("/:id", protect, deleteOutfit)
 
-module.exports = router
+module.exports = router;

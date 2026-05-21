@@ -134,7 +134,7 @@ export default function AddClothingModal({ onClose, onSubmit, loading }) {
           <div className="modal-footer">
             <button type="button" className="btn btn-ghost" onClick={onClose}>İptal</button>
             <button type="submit" className="btn btn-primary" disabled={loading || !form.name.trim()}>
-              {loading ? <span className="spinner" /> : '✦ Ekle'}
+              {loading ? <span className="spinner" /> : 'Ekle'}
             </button>
           </div>
         </form>

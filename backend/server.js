@@ -1,35 +1,37 @@
-require("dotenv").config()
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const connectDB = require('./config/db');
 
-const express = require("express")
-const cors = require("cors")
-const connectDB = require("./config/db")
-const clothingRoutes = require("./routes/clothingRoutes")
-const authRoutes = require("./routes/authRoutes")
-const outfitRoutes = require("./routes/outfitRoutes")
+const app = express();
 
-// MongoDB bağlantısı
-connectDB()
-
-const app = express()
+// Connect to Database
+connectDB();
 
 // Middleware
-app.use(cors())
-app.use(express.json())
-
-// Test Route
-app.get("/", (req, res) => {
-    res.send("Youra API çalışıyor")
-})
+app.use(cors());
+app.use(express.json({ limit: '50mb' }));
 
 // Routes
-app.use("/api/auth", authRoutes)
+const clothingRoutes = require('./routes/clothingRoutes');
+const outfitRoutes = require('./routes/outfitRoutes');
+const authRoutes = require('./routes/authRoutes');
 
-const PORT = process.env.PORT || 5000
+app.use('/api/auth', authRoutes);
 
+// Aliased routes so both your AI integration and friend's DB integration work without changing frontend code
+app.use('/api/clothing', clothingRoutes);
+app.use('/api/clothes', clothingRoutes);
+
+app.use('/api/outfit', outfitRoutes);
+app.use('/api/outfits', outfitRoutes);
+
+// Test Route
+app.get('/', (req, res) => {
+    res.send('Youra API çalışıyor');
+});
+
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
-})
-
-app.use("/api/clothes", clothingRoutes)
-
-app.use("/api/outfits", outfitRoutes)
+  console.log(`Server is running on port ${PORT}`);
+});

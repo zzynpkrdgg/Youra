@@ -18,7 +18,14 @@ export default function Login() {
     setLoading(true);
     try {
       await login(form.email, form.password);
-      navigate('/wardrobe');
+      
+      // Stil tercihi yoksa onboarding'e, varsa wardrobe'a git
+      const hasStyle = localStorage.getItem('youra_style_preferences');
+      if (hasStyle) {
+        navigate('/wardrobe');
+      } else {
+        navigate('/onboarding');
+      }
     } catch (err) {
       setError(err.response?.data?.message ?? 'Giriş başarısız. Bilgilerinizi kontrol edin.');
     } finally {

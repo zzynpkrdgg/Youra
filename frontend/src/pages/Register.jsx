@@ -26,7 +26,7 @@ export default function Register() {
     setLoading(true);
     try {
       await register(form.name, form.email, form.password);
-      navigate('/wardrobe');
+      navigate('/onboarding');
     } catch (err) {
       setError(err.response?.data?.message ?? 'Kayıt başarısız. Tekrar deneyin.');
     } finally {
