@@ -31,7 +31,12 @@ const clothingSchema = new mongoose.Schema(
         season: {
             type: String,
             required: true
-        }
+        },
+        status: {
+            type: String,
+            enum: ["available", "dirty"],
+            default: "available"
+}
     },
     {
         timestamps: true
