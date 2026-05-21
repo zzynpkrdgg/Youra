@@ -1,0 +1,225 @@
+.weather-widget-wrapper {
+  position: relative;
+  z-index: 30;
+  width: 100%;
+  max-width: 550px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOP BAR */
+.weather-top-bar {
+  display: flex;
+  border: 2px solid var(--color-text);
+  background: var(--color-bg);
+  box-shadow: 6px 6px 0 var(--color-text);
+  width: 100%;
+}
+
+.weather-info-area {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  padding: var(--space-2) var(--space-4);
+  border-right: 2px solid var(--color-text);
+}
+
+.weather-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.weather-icon-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 3px solid #ffcc00; /* Yellow circle like in mockup */
+}
+
+.weather-temp {
+  font-size: var(--text-lg);
+  font-weight: 900;
+  font-family: var(--font-mono);
+}
+
+.weather-mid {
+  font-size: var(--text-xs);
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--color-text);
+}
+
+.weather-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.weather-date {
+  font-size: var(--text-xs);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.weather-day {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-2);
+}
+
+.weather-toggle-btn {
+  width: 50px;
+  background: var(--color-text);
+  color: var(--color-bg);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.weather-toggle-btn:hover {
+  background: #222;
+}
+
+/* CALENDAR PANEL */
+.weather-calendar-panel {
+  border: 2px solid var(--color-text);
+  border-top: none;
+  background: var(--color-bg);
+  box-shadow: 6px 6px 0 var(--color-text);
+  width: 100%;
+  animation: slideDown 0.2s ease-out;
+  transform-origin: top;
+}
+
+@keyframes slideDown {
+  from { transform: scaleY(0); opacity: 0; }
+  to { transform: scaleY(1); opacity: 1; }
+}
+
+.weather-calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 2px solid var(--color-text);
+}
+
+.cal-nav-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: 900;
+  cursor: pointer;
+  color: var(--color-text);
+}
+
+.cal-month-title {
+  font-size: var(--text-sm);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.cal-header-cell {
+  text-align: center;
+  font-size: 9px;
+  font-weight: 900;
+  padding: 6px 0;
+  border-bottom: 2px solid var(--color-text);
+  border-right: 1px solid var(--color-text);
+}
+.cal-header-cell:last-child {
+  border-right: none;
+}
+
+.cal-cell {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  border-bottom: 1px solid var(--color-text);
+  border-right: 1px solid var(--color-text);
+  transition: all 0.1s;
+}
+.cal-cell:nth-child(7n) {
+  border-right: none;
+}
+.cal-cell:nth-last-child(-n+7) {
+  border-bottom: none;
+}
+
+.cal-cell--empty {
+  pointer-events: none;
+}
+
+.cal-cell--past {
+  color: #a0a0a0;
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.cal-cell--selectable {
+  background: var(--color-bg);
+  cursor: pointer;
+}
+.cal-cell--selectable:hover {
+  background: #e8e8e8;
+}
+
+.cal-cell--selected {
+  background: var(--color-text) !important;
+  color: var(--color-bg) !important;
+}
+
+/* Bugün vurgusu */
+.cal-cell--today-indicator {
+  border-bottom: 3px solid var(--color-text) !important;
+  font-weight: 900;
+}
+/* Seçiliyken arka plan siyah olacağı için çizginin beyaz olması gerekir */
+.cal-cell--selected.cal-cell--today-indicator {
+  border-bottom: 3px solid var(--color-bg) !important;
+}
+
+/* Ana menüde (static-mode olmayan yerlerde) hover kapatma */
+.weather-widget-wrapper:not(.static-mode) .cal-cell--selectable {
+  cursor: default;
+}
+.weather-widget-wrapper:not(.static-mode) .cal-cell--selectable:hover {
+  background: var(--color-bg);
+}
+
+/* Static Mode Extensions */
+.weather-widget-wrapper.static-mode {
+  height: 100%;
+}
+.static-mode .weather-calendar-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.static-mode .weather-calendar-header {
+  padding: 2px var(--space-4); /* AY değiştirme kısmını daralttık */
+}
+.static-mode .cal-grid {
+  flex: 1;
+  grid-template-rows: auto repeat(6, 1fr);
+}
+.static-mode .cal-cell {
+  height: auto;
+}

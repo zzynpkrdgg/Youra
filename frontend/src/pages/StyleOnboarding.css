@@ -1,34 +1,14 @@
+/* ── Brutalist Style Onboarding ──────────────────────── */
 .onb-page {
   min-height: 100vh;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: var(--space-8) var(--space-4) var(--space-16);
-  position: relative;
-  overflow: hidden;
+  padding: calc(var(--navbar-h, 80px) + var(--space-8)) var(--space-4) var(--space-16);
   background: var(--color-bg);
 }
 
-.onb-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(90px);
-  pointer-events: none;
-}
-.onb-orb--1 {
-  width: 600px; height: 600px;
-  background: radial-gradient(circle, var(--color-surface) 0%, transparent 70%);
-  top: -200px; left: -200px;
-}
-.onb-orb--2 {
-  width: 500px; height: 500px;
-  background: radial-gradient(circle, var(--color-surface) 0%, transparent 70%);
-  bottom: -100px; right: -100px;
-}
-
 .onb-inner {
-  position: relative;
-  z-index: 2;
   width: 100%;
   max-width: 860px;
   display: flex;
@@ -38,33 +18,34 @@
 
 /* Header */
 .onb-header {
+  position: relative;
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  padding-top: var(--space-8);
+  gap: var(--space-4);
+  border-bottom: 2px solid var(--color-text);
+  padding-bottom: var(--space-6);
 }
 
 .onb-logo {
-  font-size: var(--text-xl);
-  font-weight: 800;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: var(--text-2xl);
+  font-weight: 900;
+  color: var(--color-text);
+  letter-spacing: 0.1em;
 }
 
 .onb-title {
   font-size: clamp(var(--text-3xl), 5vw, var(--text-5xl));
   font-weight: 900;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
 }
 
 .onb-sub {
   font-size: var(--text-base);
-  color: var(--color-text-2);
-  line-height: 1.7;
+  color: var(--color-text);
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 /* Grid */
@@ -81,69 +62,70 @@
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-6) var(--space-4);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  background: var(--color-bg);
+  border: 1px solid var(--color-text);
   cursor: pointer;
-  transition: all var(--transition-base);
+  transition: all 0.15s ease-out;
   text-align: center;
+  transform: translate(-4px, -4px);
+  box-shadow: 4px 4px 0 var(--color-text);
 }
 
 .onb-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--style-color, var(--color-primary));
-  box-shadow: 0 8px 30px color-mix(in srgb, var(--style-color, var(--color-primary)) 20%, transparent);
+  transform: translate(0, 0);
+  box-shadow: 0 0 0 var(--color-text);
 }
 
 .onb-card--active {
-  border-color: var(--style-color, var(--color-primary));
-  background: color-mix(in srgb, var(--style-color, var(--color-primary)) 12%, transparent);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--style-color, var(--color-primary)) 30%, transparent),
-              0 8px 30px color-mix(in srgb, var(--style-color, var(--color-primary)) 20%, transparent);
+  border: 3px solid var(--color-text);
+  transform: translate(0, 0);
+  box-shadow: 0 0 0 var(--color-text);
+  background: var(--color-text);
+  color: var(--color-bg);
+  padding: calc(var(--space-6) - 2px) calc(var(--space-4) - 2px); 
 }
 
-.onb-check {
-  position: absolute;
-  top: var(--space-2);
-  right: var(--space-2);
-  width: 22px; height: 22px;
-  border-radius: 50%;
-  background: var(--style-color, var(--color-primary));
-  color: #fff;
-  font-size: 12px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.onb-card--active:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 4px 4px 0 var(--color-text);
+  border: 1px solid var(--color-text);
+  background: var(--color-text);
+  color: var(--color-bg);
+  padding: var(--space-6) var(--space-4);
 }
 
 .onb-emoji { font-size: 2rem; line-height: 1; }
-.onb-name  { font-size: var(--text-sm); font-weight: 700; color: var(--color-text); }
-.onb-desc  { font-size: var(--text-xs); color: var(--color-text-3); line-height: 1.4; }
+.onb-name  { font-size: var(--text-sm); font-weight: 900; text-transform: uppercase; color: var(--color-text); }
+.onb-desc  { font-size: var(--text-xs); font-family: var(--font-mono); line-height: 1.4; opacity: 0.8; color: var(--color-text); }
+
+.onb-card--active .onb-name,
+.onb-card--active .onb-desc {
+  color: var(--color-bg);
+}
 
 /* Footer */
 .onb-footer {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-4) var(--space-6);
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  backdrop-filter: blur(10px);
+  justify-content: center;
+  padding: var(--space-4) 0;
+  background: transparent;
+  border: none;
 }
 
 .onb-count {
+  position: absolute;
+  top: 0;
+  right: 0;
   font-size: var(--text-sm);
-  color: var(--color-text-2);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text);
 }
 
-.onb-btn { min-width: 160px; }
-
 @media (max-width: 768px) {
-  .onb-grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-3); }
+  .onb-grid { grid-template-columns: repeat(3, 1fr); }
 }
 @media (max-width: 520px) {
   .onb-grid { grid-template-columns: repeat(2, 1fr); }
-  .onb-footer { flex-direction: column; gap: var(--space-3); text-align: center; }
+  .onb-footer { flex-direction: column; gap: var(--space-4); text-align: center; }
 }

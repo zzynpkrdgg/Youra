@@ -34,19 +34,18 @@ export default function StyleOnboarding() {
 
   return (
     <div className="onb-page">
-      <div className="onb-orb onb-orb--1" />
-      <div className="onb-orb onb-orb--2" />
-
       <div className="onb-inner animate-fadein">
         <div className="onb-header">
-          <div className="onb-logo">YOURA</div>
-          <h1 className="onb-title">
-            Stilini <span className="text-gradient">Tanıyalım</span>
-          </h1>
+          <h1 className="onb-title">STİLİNİ TANIYALIM</h1>
           <p className="onb-sub">
             Sana en iyi kombinleri önerebilmem için tarzını seç.<br />
             <strong>En az bir seçenek işaretlemen gerekiyor.</strong>
           </p>
+          <span className="onb-count">
+            {selected.length > 0
+              ? `${selected.length} TARZ SEÇİLDİ`
+              : 'EN AZ BİR SEÇENEK İŞARETLEYİN'}
+          </span>
         </div>
 
         <div className="onb-grid">
@@ -59,7 +58,6 @@ export default function StyleOnboarding() {
                 onClick={() => toggle(style.id)}
                 style={{ '--style-color': style.color }}
               >
-                {isActive && <span className="onb-check">✓</span>}
                 <span className="onb-emoji">{style.emoji}</span>
                 <span className="onb-name">{style.name}</span>
                 <span className="onb-desc">{style.desc}</span>
@@ -69,17 +67,12 @@ export default function StyleOnboarding() {
         </div>
 
         <div className="onb-footer">
-          <span className="onb-count">
-            {selected.length > 0
-              ? `${selected.length} tarz seçildi`
-              : 'Bir veya daha fazla seçeneği işaretleyiniz'}
-          </span>
           <button
-            className="btn btn-primary btn-lg onb-btn"
+            className="btn-sharp btn-sharp--black"
             disabled={selected.length === 0}
             onClick={handleSubmit}
           >
-            Devam Et →
+            DEVAM ET →
           </button>
         </div>
       </div>
