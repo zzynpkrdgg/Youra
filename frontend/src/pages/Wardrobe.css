@@ -7,33 +7,32 @@
 
 .wardrobe-bg-marquee {
   position: fixed;
+  right: 0;
   top: 0;
-  right: -1vw; /* Force it to the edge */
-  width: max-content;
   height: 100vh;
+  width: 15vw;
   overflow: hidden;
-  z-index: 0; /* Behind content */
+  z-index: 0;
   pointer-events: none;
-  opacity: 1; /* Solid, no transparency */
   display: flex;
+  flex-direction: column;
 }
 
 .wardrobe-bg-marquee-content {
-  writing-mode: vertical-rl;
-  text-orientation: upright;
   display: flex;
-  flex-direction: row;
-  animation: scrollVerticalMarquee 40s linear infinite; /* Faster */
-  font-size: 15vw;
-  font-weight: 900;
-  color: var(--color-text);
-  line-height: 0.75; /* Reduces horizontal box size */
-  letter-spacing: -0.15em; /* Brings letters closer together */
-  text-transform: uppercase;
+  flex-direction: column;
+  animation: scrollVerticalMarquee 200s linear infinite;
 }
 
-.wardrobe-bg-marquee-content span {
-  padding-top: 15vh; /* Closer words */
+.wardrobe-bg-marquee span {
+  font-size: 20vw;
+  font-weight: 900;
+  color: var(--color-text);
+  line-height: 0.8;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  letter-spacing: -20px;
+  white-space: nowrap;
 }
 
 @keyframes scrollVerticalMarquee {
