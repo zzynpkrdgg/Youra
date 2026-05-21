@@ -185,3 +185,61 @@ exports.deleteOutfit = async (req, res) => {
         })
     }
 }
+
+exports.toggleFavoriteOutfit = async (req, res) => {
+    try {
+        const outfit = await Outfit.findById(req.params.id)
+
+        if (!outfit) {
+            return res.status(404).json({
+                message: "Kombin bulunamadı"
+            })
+        }
+
+        if (outfit.user.toString() !== req.user._id.toString()) {
+            return res.status(401).json({
+                message: "Yetkisiz işlem"
+            })
+        }
+
+        outfit.isFavorite = !outfit.isFavorite
+
+        const updatedOutfit = await outfit.save()
+
+        res.status(200).json({
+            message: updatedOutfit.isFavorite
+                ? "Kombin favorilere eklendi"
+                : "Kombin favorilerden çıkarıldı",
+            outfit: updatedOutfit
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Sunucu hatası",
+            error: error.message
+        })
+    }
+}
+
+exports.getFavoriteOutfits = async (req, res) => {
+    try {
+        const outfits = await Outfit.find({
+            user: req.user._id,
+            isFavorite: true
+        })
+            .populate("items")
+            .sort({ createdAt: -1 })
+
+        res.status(200).json({
+            message: "Favori kombinler getirildi",
+            count: outfits.length,
+            outfits
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Sunucu hatası",
+            error: error.message
+        })
+    }
+}
