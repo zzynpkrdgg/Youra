@@ -34,64 +34,69 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-page">
-      {/* Background orbs */}
-      <div className="auth-orb auth-orb--1" />
-      <div className="auth-orb auth-orb--2" />
-
-      <div className="auth-card glass animate-fadein">
-        {/* Header */}
-        <div className="auth-header">
-          <Link to="/" className="auth-logo">✦ Youra</Link>
-          <h1 className="auth-title">Tekrar Hoş Geldin</h1>
-          <p className="auth-sub">Hesabına giriş yaparak dolabına ulaş</p>
+    <div className="landing auth-page animate-fadein">
+      <div className="auth-split">
+        <div className="auth-left">
+          <div className="hero-content">
+            <p className="hero-desc" style={{ marginBottom: '40px' }}>
+              Yapay zeka stil asistanınla dolabındaki her parçayı yeniden keşfet. Modanın sınırlarını zorlayan benzersiz kombinlerle kendi tarzını yarat ve her an göz alıcı ol.
+            </p>
+            <div className="hero-actions">
+              <Link to="/login" className="btn-sharp btn-sharp--black">
+                Giriş Yap
+              </Link>
+              <Link to="/register" className="btn-sharp btn-sharp--white">
+                Kayıt Ol
+              </Link>
+            </div>
+          </div>
         </div>
+        
+        <div className="auth-right">
+          <div className="auth-box animate-fadein">
+            <form className="auth-form" onSubmit={handleSubmit}>
+              <input
+                className="auth-input"
+                type="email"
+                placeholder="E-posta"
+                value={form.email}
+                onChange={e => set('email', e.target.value)}
+                required
+                autoFocus
+              />
+              <input
+                className="auth-input"
+                type="password"
+                placeholder="Şifre"
+                value={form.password}
+                onChange={e => set('password', e.target.value)}
+                required
+              />
+              
+              {error && <p className="error-msg" style={{margin:0, fontSize: '12px'}}>{error}</p>}
+              
+              <button
+                id="login-submit"
+                type="submit"
+                className="auth-submit-btn"
+                disabled={loading}
+              >
+                {loading ? 'GİRİŞ YAPILIYOR...' : 'GİRİŞ YAP'}
+              </button>
+            </form>
 
-        {/* Form */}
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label" htmlFor="login-email">E-posta</label>
-            <input
-              id="login-email"
-              className="form-input"
-              type="email"
-              placeholder="ornek@email.com"
-              value={form.email}
-              onChange={e => set('email', e.target.value)}
-              required
-              autoFocus
-            />
+            <div className="auth-footer">
+              <span className="auth-footer-text">Hesabın yok mu?</span>
+              <Link to="/register" className="auth-footer-link">Üye Ol</Link>
+            </div>
           </div>
+        </div>
+      </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="login-password">Şifre</label>
-            <input
-              id="login-password"
-              className="form-input"
-              type="password"
-              placeholder="••••••••"
-              value={form.password}
-              onChange={e => set('password', e.target.value)}
-              required
-            />
-          </div>
-
-          {error && <p className="error-msg">⚠️ {error}</p>}
-
-          <button
-            id="login-submit"
-            type="submit"
-            className="btn btn-primary auth-submit"
-            disabled={loading}
-          >
-            {loading ? <span className="spinner" /> : 'Giriş Yap →'}
-          </button>
-        </form>
-
-        {/* Footer */}
-        <div className="auth-footer">
-          <span>Hesabın yok mu?</span>
-          <Link to="/register" className="auth-link">Üye Ol</Link>
+      <div className="marquee-container" style={{zIndex: 0}}>
+        <div className="marquee-content">
+          <span>YOURA YOURA YOURA YOURA YOURA YOURA YOURA YOURA YOURA YOURA </span>
+          <span>YOURA YOURA YOURA YOURA YOURA YOURA YOURA YOURA YOURA YOURA </span>
         </div>
       </div>
     </div>

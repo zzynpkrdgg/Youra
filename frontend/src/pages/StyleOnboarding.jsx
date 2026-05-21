@@ -33,16 +33,11 @@ export default function StyleOnboarding() {
   };
 
   return (
+  return (
     <div className="onb-page">
-      <div className="onb-orb onb-orb--1" />
-      <div className="onb-orb onb-orb--2" />
-
       <div className="onb-inner animate-fadein">
         <div className="onb-header">
-          <div className="onb-logo">YOURA</div>
-          <h1 className="onb-title">
-            Stilini <span className="text-gradient">Tanıyalım</span>
-          </h1>
+          <h1 className="onb-title">STİLİNİ TANIYALIM</h1>
           <p className="onb-sub">
             Sana en iyi kombinleri önerebilmem için tarzını seç.<br />
             <strong>En az bir seçenek işaretlemen gerekiyor.</strong>
@@ -75,11 +70,11 @@ export default function StyleOnboarding() {
               : 'Bir veya daha fazla seçeneği işaretleyiniz'}
           </span>
           <button
-            className="btn btn-primary btn-lg onb-btn"
+            className="btn-sharp btn-sharp--black"
             disabled={selected.length === 0}
             onClick={handleSubmit}
           >
-            Devam Et →
+            DEVAM ET →
           </button>
         </div>
       </div>
