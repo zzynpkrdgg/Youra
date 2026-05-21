@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
@@ -16,6 +17,13 @@ export default function Navbar() {
     logout();
     navigate('/');
   };
+
+  const [theme, setTheme] = useState('light');
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
 
   return (
     <header className="navbar">
@@ -54,12 +62,11 @@ export default function Navbar() {
                 <button className="dropdown-item" onClick={handleLogout}>ÇIKIŞ</button>
               </div>
             </div>
-          ) : (
-            <>
-              <Link to="/login"    className="btn btn-ghost btn-sm">Giriş Yap</Link>
-              <Link to="/register" className="btn btn-primary btn-sm">Üye Ol</Link>
-            </>
-          )}
+          ) : null}
+
+          <button onClick={toggleTheme} className="theme-toggle-btn" title="Temayı Değiştir">
+            {theme === 'light' ? '☾' : '☼'}
+          </button>
         </div>
       </div>
     </header>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import api from '../api/axios';
 import AddClothingModal from '../components/AddClothingModal';
+import WeatherWidget from '../components/WeatherWidget';
 import './Outfit.css';
 
 const TABS = ['Tümü', 'Üst', 'Alt', 'Elbise', 'Dış Giyim', 'Ayakkabı', 'Aksesuar'];
@@ -31,7 +32,6 @@ export default function Outfit() {
   const [chatInput, setChatInput]   = useState('');
   const [messages, setMessages]     = useState([]);
   const [generating, setGenerating] = useState(false);
-  const [isChatExpanded, setIsChatExpanded] = useState(true);
   const [isDragOver, setIsDragOver] = useState(false);
   const dragItemRef                 = useRef(null);
   const [showModal, setShowModal]   = useState(false);
@@ -123,7 +123,6 @@ export default function Outfit() {
 
     setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setChatInput('');
-    setIsChatExpanded(true);
     setGenerating(true);
 
     try {
@@ -171,16 +170,6 @@ export default function Outfit() {
   return (
     <div className="outfit-builder page-wrapper">
       
-      {/* Background Vertical Marquee (Left) */}
-      <div className="outfit-bg-marquee">
-        <div className="outfit-bg-marquee-content">
-          <span>KOMBİN</span>
-          <span>KOMBİN</span>
-          <span>KOMBİN</span>
-          <span>KOMBİN</span>
-        </div>
-      </div>
-
       {/* Brutalist Header Area */}
       <div className="brut-ob-top-section">
         <div className="brut-ob-title-area">
@@ -189,6 +178,60 @@ export default function Outfit() {
           </div>
           <div className="brut-ob-divider" />
         </div>
+      </div>
+
+      {/* TOP — Weather & AI Chat Split */}
+      <div className="brut-ob-top-split">
+        <div className="outfit-bg-marquee">
+          <div className="outfit-bg-marquee-content">
+            <span>KOMBİN</span><span>KOMBİN</span><span>KOMBİN</span><span>KOMBİN</span><span>KOMBİN</span><span>KOMBİN</span>
+          </div>
+        </div>
+
+        <div className="brut-ob-top-left">
+          <WeatherWidget staticMode={true} />
+        </div>
+        <div className="brut-ob-chat-section">
+          
+          <div className="brut-ob-messages-wrapper">
+          <div className="brut-ob-messages">
+            {messages.map((m, i) => (
+              <div key={i} className={`brut-ob-msg ${m.role === 'ai' ? 'msg-ai' : 'msg-user'}`}>
+                <div className="brut-ob-msg-avatar">{m.role === 'ai' ? 'AI' : 'U'}</div>
+                <div className="brut-ob-msg-bubble">{m.content}</div>
+              </div>
+            ))}
+            {generating && (
+              <div className="brut-ob-msg msg-ai">
+                <div className="brut-ob-msg-avatar">AI</div>
+                <div className="brut-ob-msg-bubble">YAZIYOR...</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="brut-ob-input-row">
+          <input
+            className="brut-ob-chat-input"
+            placeholder={
+              outfitItems.length === 0
+                ? "NASIL BİR KOMBİN İSTİYORSUN? ÖRN: SİYAH AĞIRLIKLI..."
+                : "KOMBİNİNE NE EKLENSİN?"
+            }
+            value={chatInput}
+            onChange={e => setChatInput(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGenerate(); } }}
+            disabled={generating}
+          />
+          <button
+            className="brut-ob-generate-btn"
+            onClick={handleGenerate}
+            disabled={generating}
+          >
+            {generating ? '...' : 'OLUŞTUR'}
+          </button>
+        </div>
+      </div>
       </div>
 
       <div className="brut-ob-main-wrapper">
@@ -299,59 +342,7 @@ export default function Outfit() {
 
       </div>
 
-      {/* BOTTOM — AI Chat */}
-      <div className="brut-ob-chat-section">
-        
-        {messages.length > 0 && (
-          <div className="brut-ob-messages-wrapper">
-            {isChatExpanded ? (
-              <>
-                <button className="brut-ob-chat-toggle" onClick={() => setIsChatExpanded(false)}>GİZLE</button>
-                <div className="brut-ob-messages">
-                  {messages.map((m, i) => (
-                    <div key={i} className={`brut-ob-msg ${m.role === 'ai' ? 'msg-ai' : 'msg-user'}`}>
-                      <div className="brut-ob-msg-avatar">{m.role === 'ai' ? 'AI' : 'U'}</div>
-                      <div className="brut-ob-msg-bubble">{m.content}</div>
-                    </div>
-                  ))}
-                  {generating && (
-                    <div className="brut-ob-msg msg-ai">
-                      <div className="brut-ob-msg-avatar">AI</div>
-                      <div className="brut-ob-msg-bubble">YAZIYOR...</div>
-                    </div>
-                  )}
-                </div>
-              </>
-            ) : (
-              <button className="brut-ob-chat-expand" onClick={() => setIsChatExpanded(true)}>
-                SOHBETİ GÖSTER ({messages.length})
-              </button>
-            )}
-          </div>
-        )}
 
-        <div className="brut-ob-input-row">
-          <input
-            className="brut-ob-chat-input"
-            placeholder={
-              outfitItems.length === 0
-                ? "NASIL BİR KOMBİN İSTİYORSUN? ÖRN: SİYAH AĞIRLIKLI..."
-                : "KOMBİNİNE NE EKLENSİN?"
-            }
-            value={chatInput}
-            onChange={e => setChatInput(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGenerate(); } }}
-            disabled={generating}
-          />
-          <button
-            className="brut-ob-generate-btn"
-            onClick={handleGenerate}
-            disabled={generating}
-          >
-            {generating ? '...' : 'OLUŞTUR'}
-          </button>
-        </div>
-      </div>
 
       {/* Add Modal */}
       {showModal && (

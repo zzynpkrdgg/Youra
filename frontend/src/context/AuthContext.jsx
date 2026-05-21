@@ -49,8 +49,17 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
+  const updateProfile = useCallback(async (updates) => {
+    // ── Mock Profil Güncelleme (Backend hazır olana kadar) ──
+    setUser(prev => {
+      const updatedUser = { ...prev, ...updates };
+      localStorage.setItem('youra_user', JSON.stringify(updatedUser));
+      return updatedUser;
+    });
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );
