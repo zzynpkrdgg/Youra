@@ -1,5 +1,5 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const Clothing = require("../models/Clothing")
+const Clothing = require("../models/clothing")
 const supabase = require("../config/supabase")
 
 exports.analyzeClothing = async (req, res) => {

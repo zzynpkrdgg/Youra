@@ -1,6 +1,6 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const Outfit = require("../models/Outfit")
-const Clothing = require("../models/Clothing")
+const Outfit = require("../models/outfit")
+const Clothing = require("../models/clothing")
 
 exports.generateOutfit = async (req, res) => {
   try {

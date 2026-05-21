@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const User = require("../models/user");
 
 const testAuth = (req, res) => {
     res.json({
@@ -10,10 +10,10 @@ const testAuth = (req, res) => {
 
 const registerUser = async (req, res) => {
     try {
-        const { username, email, password } = req.body;
+        const { name, email, password } = req.body;
 
         // Validation
-        if (!username || !email || !password) {
+        if (!name || !email || !password) {
             return res.status(400).json({ message: "Tüm alanlar zorunludur" });
         }
 
@@ -36,7 +36,7 @@ const registerUser = async (req, res) => {
 
         // Create user in DB
         const user = await User.create({
-            username,
+            username: name,
             email,
             password: hashedPassword
         });
