@@ -33,7 +33,6 @@ export default function StyleOnboarding() {
   };
 
   return (
-  return (
     <div className="onb-page">
       <div className="onb-inner animate-fadein">
         <div className="onb-header">
@@ -42,6 +41,11 @@ export default function StyleOnboarding() {
             Sana en iyi kombinleri önerebilmem için tarzını seç.<br />
             <strong>En az bir seçenek işaretlemen gerekiyor.</strong>
           </p>
+          <span className="onb-count">
+            {selected.length > 0
+              ? `${selected.length} TARZ SEÇİLDİ`
+              : 'EN AZ BİR SEÇENEK İŞARETLEYİN'}
+          </span>
         </div>
 
         <div className="onb-grid">
@@ -54,7 +58,6 @@ export default function StyleOnboarding() {
                 onClick={() => toggle(style.id)}
                 style={{ '--style-color': style.color }}
               >
-                {isActive && <span className="onb-check">✓</span>}
                 <span className="onb-emoji">{style.emoji}</span>
                 <span className="onb-name">{style.name}</span>
                 <span className="onb-desc">{style.desc}</span>
@@ -64,11 +67,6 @@ export default function StyleOnboarding() {
         </div>
 
         <div className="onb-footer">
-          <span className="onb-count">
-            {selected.length > 0
-              ? `${selected.length} tarz seçildi`
-              : 'Bir veya daha fazla seçeneği işaretleyiniz'}
-          </span>
           <button
             className="btn-sharp btn-sharp--black"
             disabled={selected.length === 0}

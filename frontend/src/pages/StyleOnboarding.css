@@ -18,6 +18,7 @@
 
 /* Header */
 .onb-header {
+  position: relative;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -64,41 +65,38 @@
   background: var(--color-bg);
   border: 1px solid var(--color-text);
   cursor: pointer;
-  transition: transform 0.1s linear, box-shadow 0.1s linear;
+  transition: all 0.15s ease-out;
   text-align: center;
-}
-
-.onb-card:hover {
   transform: translate(-4px, -4px);
   box-shadow: 4px 4px 0 var(--color-text);
 }
 
-.onb-card--active {
-  background: var(--color-text);
-  color: var(--color-bg);
-  transform: translate(-4px, -4px);
-  box-shadow: 4px 4px 0 var(--color-bg), 0 0 0 1px var(--color-text);
+.onb-card:hover {
+  transform: translate(0, 0);
+  box-shadow: 0 0 0 var(--color-text);
 }
 
-.onb-check {
-  position: absolute;
-  top: var(--space-2);
-  right: var(--space-2);
-  width: 20px; 
-  height: 20px;
-  background: var(--color-bg);
-  color: var(--color-text);
-  border: 1px solid var(--color-bg);
-  font-size: 12px;
-  font-weight: 900;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.onb-card--active {
+  border: 3px solid var(--color-text);
+  transform: translate(0, 0);
+  box-shadow: 0 0 0 var(--color-text);
+  background: var(--color-text);
+  color: var(--color-bg);
+  padding: calc(var(--space-6) - 2px) calc(var(--space-4) - 2px); 
+}
+
+.onb-card--active:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 4px 4px 0 var(--color-text);
+  border: 1px solid var(--color-text);
+  background: var(--color-text);
+  color: var(--color-bg);
+  padding: var(--space-6) var(--space-4);
 }
 
 .onb-emoji { font-size: 2rem; line-height: 1; }
-.onb-name  { font-size: var(--text-sm); font-weight: 900; text-transform: uppercase; }
-.onb-desc  { font-size: var(--text-xs); font-family: var(--font-mono); line-height: 1.4; opacity: 0.8; }
+.onb-name  { font-size: var(--text-sm); font-weight: 900; text-transform: uppercase; color: var(--color-text); }
+.onb-desc  { font-size: var(--text-xs); font-family: var(--font-mono); line-height: 1.4; opacity: 0.8; color: var(--color-text); }
 
 .onb-card--active .onb-name,
 .onb-card--active .onb-desc {
@@ -108,15 +106,16 @@
 /* Footer */
 .onb-footer {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-4) var(--space-6);
-  background: var(--color-bg);
-  border: 1px solid var(--color-text);
-  border-top: 4px solid var(--color-text);
+  justify-content: center;
+  padding: var(--space-4) 0;
+  background: transparent;
+  border: none;
 }
 
 .onb-count {
+  position: absolute;
+  top: 0;
+  right: 0;
   font-size: var(--text-sm);
   font-weight: 700;
   text-transform: uppercase;
