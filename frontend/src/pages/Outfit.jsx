@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import api from '../api/axios';
+import AddClothingModal from '../components/AddClothingModal';
 import './Outfit.css';
 
 const TABS = ['Tümü', 'Üst', 'Alt', 'Elbise', 'Dış Giyim', 'Ayakkabı', 'Aksesuar'];
@@ -11,16 +12,16 @@ const CAT_ICONS = {
 
 // Demo kıyafetler (backend hazır olana kadar)
 const DEMO_ITEMS = [
-  { _id:'d1', name:'Beyaz T-Shirt',    category:'Üst',       color:'#e8e8e8', season:'Yaz',             brand:'Zara' },
-  { _id:'d2', name:'Siyah Pantolon',   category:'Alt',       color:'#1a1a1a', season:'Tüm Mevsimler',   brand:'' },
-  { _id:'d3', name:'Denim Ceket',      category:'Dış Giyim', color:'#5b7ea6', season:'İlkbahar',        brand:"Levi's" },
-  { _id:'d4', name:'Beyaz Sneaker',    category:'Ayakkabı',  color:'#f0f0f0', season:'Tüm Mevsimler',   brand:'Nike' },
-  { _id:'d5', name:'Çizgili Gömlek',   category:'Üst',       color:'#4a90e2', season:'Tüm Mevsimler',   brand:'' },
-  { _id:'d6', name:'Chino Pantolon',   category:'Alt',       color:'#c8a96e', season:'İlkbahar',        brand:'H&M' },
-  { _id:'d7', name:'Siyah Blazer',     category:'Dış Giyim', color:'#222222', season:'Tüm Mevsimler',   brand:'' },
-  { _id:'d8', name:'Kırmızı Etek',     category:'Elbise',    color:'#dc2626', season:'Yaz',             brand:'Zara' },
-  { _id:'d9', name:'Spor Ayakkabı',    category:'Ayakkabı',  color:'#f97316', season:'Yaz',             brand:'Adidas' },
-  { _id:'d10',name:'Keten Gömlek',     category:'Üst',       color:'#d4c5a9', season:'Yaz',             brand:'' },
+  { _id:'d1', name:'BEYAZ T-SHIRT',    category:'Üst',       color:'#e8e8e8', season:'Yaz',             brand:'ZARA' },
+  { _id:'d2', name:'SİYAH PANTOLON',   category:'Alt',       color:'#1a1a1a', season:'Tüm Mevsimler',   brand:'' },
+  { _id:'d3', name:'DENİM CEKET',      category:'Dış Giyim', color:'#5b7ea6', season:'İlkbahar',        brand:"LEVI'S" },
+  { _id:'d4', name:'BEYAZ SNEAKER',    category:'Ayakkabı',  color:'#f0f0f0', season:'Tüm Mevsimler',   brand:'NIKE' },
+  { _id:'d5', name:'ÇİZGİLİ GÖMLEK',   category:'Üst',       color:'#4a90e2', season:'Tüm Mevsimler',   brand:'' },
+  { _id:'d6', name:'CHINO PANTOLON',   category:'Alt',       color:'#c8a96e', season:'İlkbahar',        brand:'H&M' },
+  { _id:'d7', name:'SİYAH BLAZER',     category:'Dış Giyim', color:'#222222', season:'Tüm Mevsimler',   brand:'' },
+  { _id:'d8', name:'KIRMIZI ETEK',     category:'Elbise',    color:'#dc2626', season:'Yaz',             brand:'ZARA' },
+  { _id:'d9', name:'SPOR AYAKKABI',    category:'Ayakkabı',  color:'#f97316', season:'Yaz',             brand:'ADIDAS' },
+  { _id:'d10',name:'KETEN GÖMLEK',     category:'Üst',       color:'#d4c5a9', season:'Yaz',             brand:'' },
 ];
 
 export default function Outfit() {
@@ -33,6 +34,8 @@ export default function Outfit() {
   const [isChatExpanded, setIsChatExpanded] = useState(true);
   const [isDragOver, setIsDragOver] = useState(false);
   const dragItemRef                 = useRef(null);
+  const [showModal, setShowModal]   = useState(false);
+  const [addLoading, setAddLoading] = useState(false);
 
   // Dolabı çek
   useEffect(() => {
@@ -40,6 +43,21 @@ export default function Outfit() {
       .then(({ data }) => setWardrobe(data.clothes || data || DEMO_ITEMS))
       .catch(() => setWardrobe(DEMO_ITEMS));
   }, []);
+
+  // Kıyafet Ekle (Modal)
+  const handleAdd = async (form) => {
+    setAddLoading(true);
+    try {
+      const { data } = await api.post('/clothing', form);
+      // Yeni eklenen kıyafeti wardrobe state'ine ekle
+      setWardrobe(prev => [data, ...prev]);
+      setShowModal(false);
+    } catch (err) {
+      alert(err.response?.data?.message ?? 'Eklenemedi.');
+    } finally {
+      setAddLoading(false);
+    }
+  };
 
   // Filtrele
   const filtered = activeTab === 'Tümü'
@@ -62,9 +80,7 @@ export default function Outfit() {
     const item = dragItemRef.current;
     dragItemRef.current = null;
     setOutfitItems(prev => {
-      // Aynı kategorideki eski öğeyi çıkar ve yenisini ekle
       const filtered = prev.filter(i => i.category !== item.category);
-      // Eğer grid dolduysa ve yeni ekleniyorsa (9 sınırına takılmamak için, gerçi kategori sayısı 7)
       return [...filtered, item].slice(0, 9);
     });
   };
@@ -81,7 +97,7 @@ export default function Outfit() {
     
     const currentMode = outfitItems.length === 0 ? 'sifirdan' : 'tamamla';
     const userMsg = chatInput.trim() ||
-      (currentMode === 'sifirdan' ? 'Bana kombin öner' : 'Seçtiğim kıyafetlere göre kombinimi tamamla');
+      (currentMode === 'sifirdan' ? 'BANA KOMBİN ÖNER' : 'SEÇTİĞİM KIYAFETLERE GÖRE KOMBİNİMİ TAMAMLA');
 
     setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setChatInput('');
@@ -99,7 +115,6 @@ export default function Outfit() {
       
       const aiData = data.data;
       if (aiData && aiData.suggested_outfit) {
-        // AI'dan dönen ID'leri eşleştir
         const suggestedItems = wardrobe.filter(item => aiData.suggested_outfit.includes(item._id));
         
         if (currentMode === 'sifirdan') {
@@ -123,8 +138,8 @@ export default function Outfit() {
       setMessages(prev => [...prev, {
         role: 'ai',
         content: currentMode === 'sifirdan'
-          ? 'Sana önerim: Beyaz t-shirt + siyah slim pantolon + denim ceket kombinasyonu. Rahat ama şık bir görünüm için beyaz sneaker ekleyebilirsin.'
-          : `Seçtiğin ${outfitItems.map(i=>i.name).join(', ')} ile harika görüneceksin! Eksik parçalar için yanına ${outfitItems.length < 2 ? 'koyu renk bir alt + beyaz sneaker' : 'nötr tonlarda bir dış giyim'} öneririm.`,
+          ? 'SANA ÖNERİM: BEYAZ T-SHIRT + SİYAH SLİM PANTOLON + DENİM CEKET.'
+          : `EKSİK PARÇALAR İÇİN YANINA KOYU RENK BİR ALT + BEYAZ SNEAKER ÖNERİRİM.`,
       }]);
     } finally {
       setGenerating(false);
@@ -133,170 +148,165 @@ export default function Outfit() {
 
   return (
     <div className="outfit-builder page-wrapper">
-      {/* ── Page Header ─────────────────────────── */}
-      <div className="ob-top-bar container">
-        <h1 className="ob-title">
-          <span className="text-gradient">Kombin Oluştur</span>
-        </h1>
+      
+      {/* Background Vertical Marquee (Left) */}
+      <div className="outfit-bg-marquee">
+        <div className="outfit-bg-marquee-content">
+          <span>KOMBİN</span>
+          <span>KOMBİN</span>
+          <span>KOMBİN</span>
+          <span>KOMBİN</span>
+        </div>
       </div>
 
-      {/* ── Main Split Panel ──────────────────────── */}
-      <div className="ob-split container">
+      {/* Brutalist Header Area */}
+      <div className="brut-ob-top-section">
+        <div className="brut-ob-title-area">
+          <div className="brut-ob-title-row">
+            <h1 className="brut-ob-title">KOMBİN OLUŞTUR</h1>
+          </div>
+          <div className="brut-ob-divider" />
+        </div>
+      </div>
 
-        {/* LEFT — Dolap */}
-        <div className="ob-left">
-          <div className="ob-panel-title">
-            Dolabım
-            <span className="ob-item-count">{wardrobe.length} parça</span>
+      <div className="brut-ob-main-wrapper">
+        
+        {/* LEFT — Dolap (Kıyafet Seçimi) */}
+        <div className="brut-ob-left-container">
+          <div className="brut-ob-left">
+            
+            <div className="brut-ob-left-header">
+              <div className="brut-ob-left-title-row">
+                <h2 className="brut-ob-panel-title">DOLABIM [{wardrobe.length}]</h2>
+                <button 
+                  className="brut-ob-add-btn" 
+                  onClick={() => setShowModal(true)}
+                >
+                  KIYAFET EKLE
+                </button>
+              </div>
+            {/* Category Tabs */}
+            <div className="brut-ob-tabs">
+              {TABS.map(tab => (
+                <button
+                  key={tab}
+                  className={`brut-ob-tab ${activeTab === tab ? 'active' : ''}`}
+                  onClick={() => setActiveTab(tab)}
+                >
+                  {tab.toUpperCase()}
+                </button>
+              ))}
+            </div>
           </div>
 
-          {/* Category tabs */}
-          <div className="ob-tabs">
-            {TABS.map(tab => (
-              <button
-                key={tab}
-                className={`ob-tab ${activeTab === tab ? 'ob-tab--active' : ''}`}
-                onClick={() => setActiveTab(tab)}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-
-          {/* Clothing mini-cards */}
-          <div className="ob-clothing-grid">
+          <div className="brut-ob-clothing-grid">
             {filtered.length === 0 ? (
-              <p className="ob-empty-hint">Bu kategoride kıyafet yok.</p>
+              <p className="brut-ob-empty">BU KATEGORİDE KIYAFET YOK.</p>
             ) : filtered.map(item => (
               <div
                 key={item._id}
-                className="ob-clothing-card"
+                className="brut-ob-mini-card"
                 draggable
                 onDragStart={e => handleDragStart(e, item)}
-                title={`${item.name} — sürükle`}
               >
                 <div
-                  className="ob-clothing-thumb"
-                  style={{ background: `linear-gradient(135deg, ${item.color}44, ${item.color}22)` }}
-                >
-                  <span className="ob-clothing-emoji">
-                    {CAT_ICONS[item.category] ?? ''}
-                  </span>
-                  <span
-                    className="ob-color-dot"
-                    style={{ background: item.color }}
-                  />
+                  className="brut-ob-mini-thumb"
+                  style={{ background: `linear-gradient(135deg, ${item.color}44, ${item.color}11)` }}
+                />
+                <div className="brut-ob-mini-info">
+                  <span className="brut-ob-mini-name">{item.name}</span>
                 </div>
-                <div className="ob-clothing-info">
-                  <span className="ob-clothing-name">{item.name}</span>
-                  {item.brand && <span className="ob-clothing-brand">{item.brand}</span>}
-                </div>
-                <span className="ob-drag-hint">⠿</span>
               </div>
             ))}
           </div>
         </div>
+        </div>
 
         {/* RIGHT — Kombin Kanvası */}
-        <div className="ob-right">
-          <div className="ob-panel-title">
-            Kombin Kanvası
+        <div className="brut-ob-right">
+          <div className="brut-ob-right-header">
+            <h2 className="brut-ob-panel-title">KANVAS</h2>
             {outfitItems.length > 0 && (
-              <button className="ob-clear-btn" onClick={clearOutfit}>Temizle</button>
+              <button className="brut-ob-clear-btn" onClick={clearOutfit}>TEMİZLE</button>
             )}
           </div>
 
           <div
-            className={`ob-canvas ${isDragOver ? 'ob-canvas--dragover' : ''} ${outfitItems.length === 0 ? 'ob-canvas--empty' : ''}`}
+            className={`brut-ob-canvas ${isDragOver ? 'dragover' : ''} ${outfitItems.length === 0 ? 'empty' : ''}`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
             {outfitItems.length === 0 ? (
-              <div className="ob-canvas-placeholder">
-                <p>Kıyafetleri buraya sürükle</p>
-                <span className="ob-canvas-hint">Sol panelden kıyafet sürükleyip bırak</span>
+              <div className="brut-ob-canvas-placeholder">
+                <p>KIYAFETLERİ<br/>SÜRÜKLE</p>
               </div>
             ) : (
-              <div className="ob-canvas-items">
+              <div className="brut-ob-canvas-items">
                 {Array.from({ length: 9 }).map((_, i) => {
                   const item = outfitItems[i];
                   if (item) {
                     return (
-                      <div key={item._id} className="ob-canvas-item animate-fadein">
+                      <div key={item._id} className="brut-ob-canvas-item animate-fadein">
                         <div
-                          className="ob-canvas-thumb"
+                          className="brut-ob-canvas-thumb"
                           style={{ background: `linear-gradient(135deg, ${item.color}55, ${item.color}22)` }}
-                        >
-                          <span>{CAT_ICONS[item.category] ?? ''}</span>
-                        </div>
-                        <span className="ob-canvas-item-name">{item.name}</span>
+                        />
+                        <span className="brut-ob-canvas-name">{item.name}</span>
                         <button
-                          className="ob-canvas-remove"
+                          className="brut-ob-canvas-remove"
                           onClick={() => removeFromOutfit(item._id)}
                         >✕</button>
                       </div>
                     );
                   }
-                  return <div key={`empty-${i}`} className="ob-canvas-empty-slot" />;
+                  return <div key={`empty-${i}`} className="brut-ob-canvas-empty" />;
                 })}
               </div>
             )}
           </div>
         </div>
+
       </div>
 
-      {/* ── Bottom Chat + Generate ────────────────── */}
-      <div className="ob-bottom container">
-
-        {/* AI Mesajları */}
+      {/* BOTTOM — AI Chat */}
+      <div className="brut-ob-chat-section">
+        
         {messages.length > 0 && (
-          <div className="ob-messages-wrapper animate-fadein">
+          <div className="brut-ob-messages-wrapper">
             {isChatExpanded ? (
               <>
-                <button 
-                  className="ob-chat-toggle" 
-                  onClick={() => setIsChatExpanded(false)}
-                  title="Küçült"
-                >
-                  ▼
-                </button>
-                <div className="ob-messages">
+                <button className="brut-ob-chat-toggle" onClick={() => setIsChatExpanded(false)}>GİZLE</button>
+                <div className="brut-ob-messages">
                   {messages.map((m, i) => (
-                    <div key={i} className={`ob-msg ob-msg--${m.role} animate-fadein`}>
-                      {m.role === 'ai' && <span className="ob-msg-avatar">Y</span>}
-                      <div className="ob-msg-bubble">{m.content}</div>
-                      {m.role === 'user' && <span className="ob-msg-avatar ob-msg-avatar--user">U</span>}
+                    <div key={i} className={`brut-ob-msg ${m.role === 'ai' ? 'msg-ai' : 'msg-user'}`}>
+                      <div className="brut-ob-msg-avatar">{m.role === 'ai' ? 'AI' : 'U'}</div>
+                      <div className="brut-ob-msg-bubble">{m.content}</div>
                     </div>
                   ))}
                   {generating && (
-                    <div className="ob-msg ob-msg--ai animate-fadein">
-                      <span className="ob-msg-avatar">Y</span>
-                      <div className="ob-msg-bubble ob-msg-bubble--typing">
-                        <span /><span /><span />
-                      </div>
+                    <div className="brut-ob-msg msg-ai">
+                      <div className="brut-ob-msg-avatar">AI</div>
+                      <div className="brut-ob-msg-bubble">YAZIYOR...</div>
                     </div>
                   )}
                 </div>
               </>
             ) : (
-              <button 
-                className="ob-chat-expand-btn animate-fadein" 
-                onClick={() => setIsChatExpanded(true)}
-              >
-                Sohbet Geçmişini Göster ({messages.length} mesaj)
+              <button className="brut-ob-chat-expand" onClick={() => setIsChatExpanded(true)}>
+                SOHBETİ GÖSTER ({messages.length})
               </button>
             )}
           </div>
         )}
 
-        <div className="ob-input-row">
+        <div className="brut-ob-input-row">
           <input
-            className="ob-chat-input"
+            className="brut-ob-chat-input"
             placeholder={
               outfitItems.length === 0
-                ? 'Nasıl bir kombin istiyorsun? Örn: İş toplantısına gidiyorum...'
-                : 'Kombinine ne eklensin? Örn: Casual ama biraz daha şık olsun...'
+                ? "NASIL BİR KOMBİN İSTİYORSUN? ÖRN: SİYAH AĞIRLIKLI..."
+                : "KOMBİNİNE NE EKLENSİN?"
             }
             value={chatInput}
             onChange={e => setChatInput(e.target.value)}
@@ -304,16 +314,24 @@ export default function Outfit() {
             disabled={generating}
           />
           <button
-            className="ob-generate-btn"
+            className="brut-ob-generate-btn"
             onClick={handleGenerate}
             disabled={generating}
           >
-            {generating
-              ? <span className="spinner" />
-              : <>Kombini Oluştur</>}
+            {generating ? '...' : 'OLUŞTUR'}
           </button>
         </div>
       </div>
+
+      {/* Add Modal */}
+      {showModal && (
+        <AddClothingModal
+          onClose={() => setShowModal(false)}
+          onSubmit={handleAdd}
+          loading={addLoading}
+        />
+      )}
+
     </div>
   );
 }

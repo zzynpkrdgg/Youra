@@ -5,7 +5,7 @@ import AddClothingModal from '../components/AddClothingModal';
 import './Wardrobe.css';
 
 const CATEGORIES = ['Tümü', 'Üst', 'Alt', 'Elbise', 'Dış Giyim', 'Ayakkabı', 'Aksesuar', 'Diğer'];
-const SEASONS    = ['Tümü', 'İlkbahar', 'Yaz', 'Sonbahar', 'Kış', 'Tüm Mevsimler'];
+const SEASONS    = ['Mevsim', 'İlkbahar', 'Yaz', 'Sonbahar', 'Kış'];
 
 const DEMO_ITEMS = [
   { _id:'d1', name:'Beyaz T-Shirt',    category:'Üst',       color:'#e8e8e8', season:'Yaz',             brand:'Zara' },
@@ -21,7 +21,7 @@ export default function Wardrobe() {
   const [addLoading, setAddLoading] = useState(false);
   const [showModal, setShowModal]   = useState(false);
   const [filterCat, setFilterCat]   = useState('Tümü');
-  const [filterSea, setFilterSea]   = useState('Tümü');
+  const [filterSea, setFilterSea]   = useState('Mevsim');
   const [search, setSearch]         = useState('');
   const [error, setError]           = useState('');
 
@@ -72,98 +72,95 @@ export default function Wardrobe() {
   // Filter & search
   const filtered = items.filter(item => {
     const matchCat = filterCat === 'Tümü' || item.category === filterCat;
-    const matchSea = filterSea === 'Tümü' || item.season === filterSea;
+    const matchSea = filterSea === 'Mevsim' || filterSea === 'Tümü' || item.season === filterSea;
     const matchQ   = !search || item.name.toLowerCase().includes(search.toLowerCase())
                              || item.brand?.toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSea && matchQ;
   });
 
   return (
-    <div className="page-wrapper">
-      <div className="wardrobe container">
-        {/* Page Header */}
-        <div className="wardrobe-header">
-          <div>
-            <h1 className="wardrobe-title">
-              <span className="text-gradient">Dolabım</span>
-            </h1>
-            <p className="wardrobe-count">
-              {loading ? '...' : `${items.length} kıyafet`}
-            </p>
+    <div className="page-wrapper wardrobe-wrapper">
+      {/* Background Vertical Marquee */}
+      <div className="wardrobe-bg-marquee">
+        <div className="wardrobe-bg-marquee-content">
+          <span>DOLAP</span>
+          <span>DOLAP</span>
+          <span>DOLAP</span>
+          <span>DOLAP</span>
+        </div>
+      </div>
+
+      <div className="wardrobe">
+        <div className="wardrobe-content-overlay">
+          {/* Brutalist Header */}
+        <div className="brut-top-section">
+          <div className="brut-title-area">
+            <div className="brut-title-row">
+              <h1 className="brut-title">DOLABIM</h1>
+              <span className="brut-count">{loading ? '...' : `${items.length} KIYAFET`}</span>
+            </div>
+            <div className="brut-thick-line" />
           </div>
-          <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-            + Kıyafet Ekle
+          <button className="btn-sharp btn-sharp--white brut-add-btn" onClick={() => setShowModal(true)}>
+            KIYAFET EKLE
           </button>
         </div>
 
-        {/* Filters */}
-        <div className="wardrobe-filters">
-          {/* Search */}
+        {/* Brutalist Filter Bar */}
+        <div className="brut-filter-bar">
           <input
-            className="form-input wardrobe-search"
-            placeholder="Kıyafet ara..."
+            className="brut-search"
+            placeholder="ARAMA ÇUBUĞU..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
-
-          {/* Category chips */}
-          <div className="filter-chips">
+          <div className="brut-filter-tabs">
             {CATEGORIES.map(c => (
               <button
                 key={c}
-                className={`chip ${filterCat === c ? 'chip-active' : ''}`}
+                className={`brut-tab ${filterCat === c ? 'brut-tab--active' : ''}`}
                 onClick={() => setFilterCat(c)}
               >
-                {c}
+                {c.toUpperCase()}
               </button>
             ))}
           </div>
-
-          {/* Season select */}
           <select
-            className="form-select wardrobe-season-select"
+            className="brut-season-select"
             value={filterSea}
             onChange={e => setFilterSea(e.target.value)}
           >
-            {SEASONS.map(s => <option key={s}>{s}</option>)}
+            {SEASONS.map(s => <option key={s}>{s.toUpperCase()}</option>)}
           </select>
         </div>
 
         {/* Error */}
         {error && <p className="error-msg">{error}</p>}
 
-        {/* Grid */}
-        {loading ? (
-          <div className="wardrobe-loading">
-            <div className="spinner" style={{ width: 40, height: 40, borderWidth: 3 }} />
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="wardrobe-empty animate-fadein">
-            <h2>
-              {items.length === 0 ? 'Dolabın henüz boş' : 'Sonuç bulunamadı'}
-            </h2>
-            <p>
-              {items.length === 0
-                ? 'İlk kıyafetini ekleyerek başla ve AI asistanından kombin iste!'
-                : 'Farklı filtreler veya arama terimleri dene.'}
-            </p>
-            {items.length === 0 && (
-              <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-                İlk Kıyafeti Ekle
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="wardrobe-grid">
-            {filtered.map(item => (
-              <ClothingCard
-                key={item._id}
-                item={item}
-                onDelete={handleDelete}
-              />
-            ))}
-          </div>
-        )}
+        {/* Main Grid Container */}
+        <div className="brut-main-container">
+          {loading ? (
+            <div className="wardrobe-loading">
+              <div className="spinner" style={{ width: 40, height: 40, borderWidth: 3, borderColor: 'var(--color-text)', borderTopColor: 'transparent' }} />
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="wardrobe-empty">
+              <h2>{items.length === 0 ? 'DOLABIN HENÜZ BOŞ' : 'SONUÇ BULUNAMADI'}</h2>
+              <p>{items.length === 0 ? 'İlk kıyafetini ekleyerek başla!' : 'Farklı arama terimleri dene.'}</p>
+            </div>
+          ) : (
+            <div className="brut-grid">
+              {filtered.map(item => (
+                <ClothingCard
+                  key={item._id}
+                  item={item}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+        </div>
       </div>
 
       {/* Add Modal */}

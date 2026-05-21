@@ -47,18 +47,18 @@ export default function ClothingCard({ item, onDelete, onEdit }) {
       <div className="clothing-card-body">
         <div className="clothing-card-header">
           <h3 className="clothing-card-name">{item.name}</h3>
-          <span
-            className="clothing-card-season"
-            style={{ color: seasonColor }}
-          >
-            {item.season}
-          </span>
+          {item.season && item.season !== 'Tümü' && (
+            <span className="clothing-card-season">{item.season}</span>
+          )}
         </div>
 
         <div className="clothing-card-meta">
-          <span className="badge badge-primary">{item.category}</span>
+          <span className="clothing-card-brand">{item.category}</span>
           {item.brand && (
-            <span className="clothing-card-brand">{item.brand}</span>
+            <>
+              <span className="clothing-card-brand">•</span>
+              <span className="clothing-card-brand">{item.brand}</span>
+            </>
           )}
         </div>
       </div>
