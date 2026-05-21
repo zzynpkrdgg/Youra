@@ -28,8 +28,15 @@ const outfitSchema = new mongoose.Schema(
         aiSuggestion: {
             type: String,
             default: ""
-        }
+        },
+        
+        isFavorite: {
+            type: Boolean,
+            default: false
+}
     },
+    
+
     {
         timestamps: true
     }
