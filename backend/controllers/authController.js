@@ -51,7 +51,8 @@ const registerUser = async (req, res) => {
                 id: user._id,
                 name: user.username,
                 email: user.email,
-                style_preferences: user.style_preferences
+                style_preferences: user.style_preferences,
+                role: user.role
             }
         });
     } catch (error) {
@@ -97,7 +98,8 @@ const loginUser = async (req, res) => {
                 id: user._id,
                 name: user.username,
                 email: user.email,
-                style_preferences: user.style_preferences
+                style_preferences: user.style_preferences,
+                role: user.role
             }
         });
     } catch (error) {
@@ -148,7 +150,8 @@ const updateProfile = async (req, res) => {
                 name: user.username,
                 email: user.email,
                 style_preferences: user.style_preferences,
-                lastNameChangeAt: user.lastNameChangeAt
+                lastNameChangeAt: user.lastNameChangeAt,
+                role: user.role
             }
         });
     } catch (error) {

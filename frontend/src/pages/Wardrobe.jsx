@@ -77,17 +77,33 @@ export default function Wardrobe() {
   const handleEdit = async (form) => {
     setAddLoading(true);
     try {
-      const payload = {
-        image: form.imageUrl,
-        category: form.category,
-        color: form.color,
-        style: form.name,
-        season: form.season,
-        brand: form.brand,
-        notes: form.notes
-      };
-      const { data } = await api.put(`/clothing/${editingItem._id}`, payload);
-      setItems(prev => prev.map(i => i._id === editingItem._id ? data.clothing : i));
+      if (form.file) {
+        const formData = new FormData();
+        formData.append('image', form.file);
+        formData.append('category', form.category);
+        formData.append('color', form.color);
+        formData.append('style', form.name);
+        formData.append('season', form.season);
+        formData.append('brand', form.brand);
+        if (form.notes) formData.append('notes', form.notes);
+
+        const { data } = await api.put(`/clothing/${editingItem._id}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        setItems(prev => prev.map(i => i._id === editingItem._id ? data.clothing : i));
+      } else {
+        const payload = {
+          image: form.imageUrl,
+          category: form.category,
+          color: form.color,
+          style: form.name,
+          season: form.season,
+          brand: form.brand,
+          notes: form.notes
+        };
+        const { data } = await api.put(`/clothing/${editingItem._id}`, payload);
+        setItems(prev => prev.map(i => i._id === editingItem._id ? data.clothing : i));
+      }
       setEditingItem(null);
     } catch (err) {
       alert(err.response?.data?.message ?? 'Güncellenemedi.');
