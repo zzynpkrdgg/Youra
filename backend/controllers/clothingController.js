@@ -240,15 +240,35 @@ exports.updateClothing = async (req, res) => {
         const clothing = await Clothing.findById(req.params.id)
 
         if (!clothing) {
-            return res.status(404).json({
-                message: "Kıyafet bulunamadı"
-            })
+            return res.status(404).json({ message: "Kıyafet bulunamadı" })
         }
 
         if (clothing.user.toString() !== req.user._id.toString()) {
-            return res.status(401).json({
-                message: "Yetkisiz işlem"
-            })
+            return res.status(401).json({ message: "Yetkisiz işlem" })
+        }
+
+        if (req.file) {
+            const fileExt = req.file.originalname.split(".").pop()
+            const fileName = `${req.user._id}-${Date.now()}.${fileExt}`
+            const filePath = `clothes/${fileName}`
+
+            const { error } = await supabase.storage
+                .from(process.env.SUPABASE_BUCKET)
+                .upload(filePath, req.file.buffer, {
+                    contentType: req.file.mimetype
+                })
+
+            if (error) {
+                return res.status(500).json({ message: "Supabase yükleme hatası", error: error.message })
+            }
+
+            const { data } = supabase.storage
+                .from(process.env.SUPABASE_BUCKET)
+                .getPublicUrl(filePath)
+            
+            clothing.image = data.publicUrl
+        } else if (image && !image.startsWith('blob:')) {
+            clothing.image = image
         }
 
         clothing.category = (category && category.trim()) || clothing.category
@@ -256,7 +276,6 @@ exports.updateClothing = async (req, res) => {
         clothing.style = style || clothing.style
         clothing.season = season || clothing.season
         clothing.brand = brand || clothing.brand
-        if (image !== undefined) clothing.image = image
         if (imageUrl !== undefined) clothing.image = imageUrl
         if (notes !== undefined) clothing.notes = notes
 
