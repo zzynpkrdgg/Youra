@@ -74,18 +74,38 @@ export default function OutfitCard({ outfit, onDelete, onEdit, onToggleFavorite 
       {/* Kıyafet küçük önizlemeleri */}
       {outfit.items && outfit.items.length > 0 && (
         <div className="outfit-card-items">
-          {outfit.items.map((item, i) => (
+          {outfit.items.slice(0, 6).map((item, i) => (
             <div
               key={item._id ?? i}
               className="outfit-card-thumb"
-              title={item.style}
+              title={item.style || item.name || ''}
               style={{
-                background: `linear-gradient(135deg, ${item.color ?? '#888'}88, ${item.color ?? '#888'}22)`,
+                background: item.image
+                  ? `url(${item.image}) center/cover no-repeat`
+                  : `linear-gradient(135deg, ${item.color ?? '#888'}88, ${item.color ?? '#888'}22)`,
+                borderRadius: 'var(--radius-md)',
               }}
             >
-              <span className="outfit-card-thumb-label">{item.style?.slice(0, 6)}</span>
+              {!item.image && <span className="outfit-card-thumb-label">{(item.style || item.name || '?').slice(0, 6)}</span>}
             </div>
           ))}
+          {outfit.items.length > 6 && (
+            <div
+              className="outfit-card-thumb"
+              style={{
+                background: 'var(--color-bg-2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 'var(--radius-md)',
+              }}
+              title={`+${outfit.items.length - 6} daha`}
+            >
+              <span style={{ fontSize: '12px', fontWeight: '900', color: 'var(--color-text)' }}>
+                +{outfit.items.length - 6}
+              </span>
+            </div>
+          )}
         </div>
       )}
 

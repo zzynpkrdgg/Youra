@@ -75,7 +75,7 @@
 }
 
 .brut-title {
-  font-size: clamp(2rem, 8vw, var(--text-3xl));
+  font-size: var(--text-3xl);
   font-weight: 900;
   letter-spacing: 0.05em;
   color: var(--color-text);
@@ -84,7 +84,7 @@
 }
 
 .brut-count {
-  font-size: clamp(1rem, 4vw, var(--text-lg));
+  font-size: var(--text-lg);
   font-weight: 700;
   color: var(--color-text);
   letter-spacing: 0.05em;
@@ -232,21 +232,8 @@
   .brut-top-section {
     flex-direction: column;
     align-items: stretch;
-    gap: var(--space-4);
-  }
-  .brut-title-area {
-    width: 100%;
-  }
-  .brut-add-btn {
-    width: 100%;
-    margin-top: var(--space-2);
   }
   .brut-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  .brut-tab {
-    padding: var(--space-2) var(--space-3);
-    font-size: var(--text-xs);
-  }
 }
-
