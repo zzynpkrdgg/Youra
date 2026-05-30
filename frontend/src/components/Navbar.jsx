@@ -20,6 +20,7 @@ export default function Navbar() {
   };
 
   const [theme, setTheme] = useState('light');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
@@ -37,16 +38,27 @@ export default function Navbar() {
 
           {/* Nav links — yalnızca giriş yapılmışsa */}
           {user && (
-            <nav className="navbar-links">
+            <nav className={`navbar-links ${isMenuOpen ? 'open' : ''}`}>
               {NAV_LINKS.map(({ to, label }) => (
                 <Link
                   key={to}
                   to={to}
                   className={`navbar-link ${location.pathname === to ? 'active' : ''}`}
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   {label}
                 </Link>
               ))}
+              {user.role === 'admin' && (
+                <Link
+                  to="/admin"
+                  className={`navbar-link ${location.pathname === '/admin' ? 'active' : ''}`}
+                  style={{ color: '#ec4899' }}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  ADMIN PANEL
+                </Link>
+              )}
             </nav>
           )}
         </div>
@@ -68,6 +80,12 @@ export default function Navbar() {
           <button onClick={toggleTheme} className="theme-toggle-btn" title="Temayı Değiştir">
             {theme === 'light' ? '☾' : '☼'}
           </button>
+
+          {user && (
+            <button className="mobile-menu-btn" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              {isMenuOpen ? '✕' : '☰'}
+            </button>
+          )}
         </div>
       </div>
     </header>
