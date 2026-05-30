@@ -288,9 +288,6 @@
   .brut-modal-body {
     flex-direction: column;
   }
-  .brut-modal-row {
-    grid-template-columns: 1fr;
-  }
   .brut-dropzone {
     min-height: 200px;
   }

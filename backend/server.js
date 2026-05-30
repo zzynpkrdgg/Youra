@@ -17,7 +17,6 @@ const clothingRoutes = require('./routes/clothingRoutes');
 const outfitRoutes = require('./routes/outfitRoutes');
 const authRoutes = require('./routes/authRoutes');
 const weatherRoutes = require('./routes/weatherRoutes');
-const dashboardRoutes = require("./routes/dashboardRoutes");
 
 app.use('/api/auth', authRoutes);
 
@@ -31,7 +30,6 @@ app.use('/api/outfit', outfitRoutes);
 app.use('/api/outfits', outfitRoutes);
 
 app.use('/api/weather', weatherRoutes);
-app.use("/api/dashboard", dashboardRoutes);
 
 // Test Route
 app.get('/', (req, res) => {
