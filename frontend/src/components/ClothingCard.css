@@ -1,7 +1,7 @@
 /* ── Brutalist Clothing Card ───────────────────────────────── */
 .clothing-card {
   background: var(--color-bg);
-  border: 1px solid var(--color-text);
+  border: 3px solid var(--color-text);
   overflow: hidden;
   position: relative;
   display: flex;
@@ -61,7 +61,7 @@
   justify-content: center;
   position: relative;
   background: var(--color-bg-3);
-  border-bottom: 1px solid var(--color-text);
+  border-bottom: 2px solid var(--color-text);
 }
 
 .clothing-card-emoji {
@@ -79,19 +79,36 @@
 
 /* Body */
 .clothing-card-body {
-  padding: var(--space-3);
+  padding: 12px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
   background: var(--color-bg);
+  border-bottom: 2px solid var(--color-text);
 }
 
-.clothing-card-header {
+.clothing-card-info-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: var(--space-2);
+  width: 100%;
+}
+
+.clothing-card-info-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding-right: 8px;
+}
+
+.clothing-card-info-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .clothing-card-name {
@@ -106,44 +123,56 @@
   margin: 0;
 }
 
-.clothing-card-season {
+.clothing-card-category {
   font-family: var(--font-sans);
-  font-size: var(--text-xs);
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--color-text);
-  border: 1px solid var(--color-text);
-  padding: 2px 4px;
-  white-space: nowrap;
-  flex-shrink: 0;
 }
 
-.clothing-card-meta {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
+.clothing-card-season {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--color-text);
+  border: 1px solid var(--color-text);
+  padding: 4px 8px;
 }
 
 .clothing-card-brand {
   font-family: var(--font-sans);
-  font-size: var(--text-xs);
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--color-text);
 }
 
-/* Alt: SİL butonu — her zaman sabit */
+/* Alt: SİL butonu */
 .clothing-card-footer {
-  padding: 8px 12px 10px;
-  border-top: 1px solid var(--color-text);
+  padding: 8px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+  background: var(--color-bg);
 }
 
 .card-delete-btn {
-  font-size: 10px;
-  padding: 5px 14px;
-  letter-spacing: 0.08em;
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  padding: 8px;
+  letter-spacing: 0.1em;
   cursor: pointer;
+  background: transparent;
+  color: var(--color-text);
+  border: 2px solid var(--color-text);
+  transition: all 0.1s;
+}
+
+.card-delete-btn:hover {
+  background: var(--color-text);
+  color: var(--color-bg);
 }

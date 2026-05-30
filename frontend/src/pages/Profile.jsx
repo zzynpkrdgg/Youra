@@ -24,6 +24,7 @@ export default function Profile() {
   const navigate = useNavigate();
 
   const [clothingCount, setClothingCount] = useState(0);
+  const [outfitCount, setOutfitCount] = useState(0);
   const [loadingItems, setLoadingItems] = useState(true);
   const [savedStyles, setSavedStyles] = useState([]);
 
@@ -43,14 +44,19 @@ export default function Profile() {
     const styles = JSON.parse(localStorage.getItem('youra_style_preferences') || '[]');
     setSavedStyles(styles);
 
-    // Load clothing count
+    // Load counts
     const fetchCount = async () => {
       try {
-        const { data } = await api.get('/clothing');
-        setClothingCount(data.length);
+        const [clothRes, outfitRes] = await Promise.all([
+          api.get('/clothing'),
+          api.get('/outfit')
+        ]);
+        setClothingCount(clothRes.data.length);
+        setOutfitCount(outfitRes.data.length);
       } catch {
         // Fallback mock number
         setClothingCount(5); 
+        setOutfitCount(2);
       } finally {
         setLoadingItems(false);
       }
@@ -65,8 +71,26 @@ export default function Profile() {
 
   const handleProfileSave = async (e) => {
     e.preventDefault();
-    await updateProfile({ name: editName, email: editEmail });
-    setShowProfileModal(false);
+    try {
+      await updateProfile({ name: editName, email: editEmail });
+      setShowProfileModal(false);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Profil güncellenemedi');
+    }
+  };
+
+  const canEditName = () => {
+    if (!user?.lastNameChangeAt) return true;
+    const diffTime = Math.abs(new Date() - new Date(user.lastNameChangeAt));
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 15;
+  };
+
+  const getNextNameChangeDate = () => {
+    if (!user?.lastNameChangeAt) return '';
+    const date = new Date(user.lastNameChangeAt);
+    date.setDate(date.getDate() + 15);
+    return date.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
   };
 
   const openStyleModal = () => {
@@ -118,14 +142,33 @@ export default function Profile() {
           {/* Wardrobe Stat */}
           <div className="profile-card">
             <h2 className="profile-card-title">DOLAP DURUMU</h2>
-            <div className="profile-card-content">
-              <span className="profile-stat-number">{loadingItems ? '-' : clothingCount}</span>
-              <p style={{ marginTop: '10px', fontWeight: 'bold' }}>TOPLAM KIYAFET</p>
-            </div>
-            <div style={{ marginTop: '20px' }}>
-              <button className="btn-sharp btn-sharp--black" onClick={() => navigate('/wardrobe')} style={{ width: '100%' }}>
-                DOLABA GİT
-              </button>
+            <div className="profile-card-content" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              
+              {/* Clothing Section */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <span className="profile-stat-number" style={{ fontSize: '2.5rem' }}>{loadingItems ? '-' : clothingCount}</span>
+                  <p style={{ marginTop: '5px', fontWeight: 'bold' }}>TOPLAM KIYAFET</p>
+                </div>
+                <button className="btn-sharp btn-sharp--black" onClick={() => navigate('/wardrobe')} style={{ padding: '8px 16px', fontSize: '14px' }}>
+                  DOLABA GİT
+                </button>
+              </div>
+
+              {/* Divider */}
+              <div style={{ height: '2px', background: 'var(--color-text)', width: '100%' }}></div>
+
+              {/* Outfits Section */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <span className="profile-stat-number" style={{ fontSize: '2.5rem' }}>{loadingItems ? '-' : outfitCount}</span>
+                  <p style={{ marginTop: '5px', fontWeight: 'bold' }}>TOPLAM KOMBİN</p>
+                </div>
+                <button className="btn-sharp btn-sharp--black" onClick={() => navigate('/my-outfits')} style={{ padding: '8px 16px', fontSize: '14px' }}>
+                  KOMBİNLERE GİT
+                </button>
+              </div>
+
             </div>
           </div>
 
@@ -165,13 +208,18 @@ export default function Profile() {
             <button className="modal-close" onClick={() => setShowProfileModal(false)}>×</button>
             <h2 className="modal-title">PROFİLİ DÜZENLE</h2>
             <form className="modal-form" onSubmit={handleProfileSave}>
-              <input 
-                className="modal-input" 
-                value={editName} 
-                onChange={e => setEditName(e.target.value)} 
-                placeholder="Ad Soyad"
-                required
-              />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <input 
+                  className="modal-input" 
+                  value={editName} 
+                  onChange={e => setEditName(e.target.value)} 
+                  placeholder="Ad Soyad"
+                  maxLength={15}
+                  disabled={!canEditName()}
+                  required
+                />
+                {!canEditName() && <span style={{fontSize: '11px', color: 'red', fontWeight: 'bold'}}>Kullanıcı isminizi {getNextNameChangeDate()} tarihinde değiştirebilirsiniz.</span>}
+              </div>
               <input 
                 className="modal-input" 
                 value={editEmail} 

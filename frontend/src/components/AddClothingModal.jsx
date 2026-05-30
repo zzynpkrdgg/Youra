@@ -11,11 +11,11 @@ const PRESET_COLORS = [
 
 const INITIAL_FORM = {
   name: '', category: 'Üst', season: 'Mevsim',
-  color: '#000000', brand: '', imageUrl: '', notes: '',
+  color: '#000000', brand: '', imageUrl: '', notes: '', file: null,
 };
 
-export default function AddClothingModal({ onClose, onSubmit, loading }) {
-  const [form, setForm] = useState(INITIAL_FORM);
+export default function AddClothingModal({ onClose, onSubmit, loading, initialData }) {
+  const [form, setForm] = useState(initialData || INITIAL_FORM);
   const [isDragging, setIsDragging] = useState(false);
 
   const set = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
@@ -31,6 +31,7 @@ export default function AddClothingModal({ onClose, onSubmit, loading }) {
     if (!file) return;
     const url = URL.createObjectURL(file);
     set('imageUrl', url);
+    set('file', file);
   };
 
   const handleDrop = (e) => {
@@ -40,6 +41,7 @@ export default function AddClothingModal({ onClose, onSubmit, loading }) {
     if (file && file.type.startsWith('image/')) {
       const url = URL.createObjectURL(file);
       set('imageUrl', url);
+      set('file', file);
     }
   };
 
@@ -50,7 +52,7 @@ export default function AddClothingModal({ onClose, onSubmit, loading }) {
           
           {/* Header */}
           <div className="brut-modal-header">
-            <h2 className="brut-modal-title">KIYAFET EKLE</h2>
+            <h2 className="brut-modal-title">{initialData ? 'KIYAFET DÜZENLE' : 'KIYAFET EKLE'}</h2>
             <button type="button" className="brut-modal-close" onClick={onClose}>✕</button>
           </div>
           <div className="brut-modal-line-container">
@@ -141,13 +143,19 @@ export default function AddClothingModal({ onClose, onSubmit, loading }) {
               <label className="brut-label">FOTOĞRAF YÜKLE</label>
               {form.imageUrl ? (
                 <div className="brut-image-preview-container">
-                  <button 
-                    type="button" 
-                    className="brut-dropzone-remove" 
-                    onClick={() => set('imageUrl', '')}
-                  >
-                    KALDIR
-                  </button>
+                  <div className="brut-image-preview-actions">
+                    <label className="brut-dropzone-remove">
+                      DEĞİŞTİR
+                      <input type="file" accept="image/*" onChange={handleFileChange} hidden />
+                    </label>
+                    <button 
+                      type="button" 
+                      className="brut-dropzone-remove" 
+                      onClick={() => { set('imageUrl', ''); set('file', null); }}
+                    >
+                      KALDIR
+                    </button>
+                  </div>
                   <img src={form.imageUrl} className="brut-dropzone-img" alt="preview" />
                 </div>
               ) : (
@@ -171,7 +179,7 @@ export default function AddClothingModal({ onClose, onSubmit, loading }) {
           <div className="brut-modal-footer">
             <button type="button" className="btn-sharp btn-sharp--white brut-modal-cancel" onClick={onClose}>İPTAL</button>
             <button type="submit" className="btn-sharp btn-sharp--black brut-modal-submit" disabled={loading || !form.name.trim()}>
-              {loading ? 'YÜKLENİYOR...' : 'EKLE'}
+              {loading ? 'KAYDEDİLİYOR...' : (initialData ? 'KAYDET' : 'EKLE')}
             </button>
           </div>
         </form>

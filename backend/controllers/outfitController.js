@@ -221,6 +221,44 @@ exports.toggleFavoriteOutfit = async (req, res) => {
     }
 }
 
+exports.updateOutfit = async (req, res) => {
+    try {
+        const { title, occasion, notes, items } = req.body
+
+        const outfit = await Outfit.findById(req.params.id)
+
+        if (!outfit) {
+            return res.status(404).json({
+                message: "Kombin bulunamadı"
+            })
+        }
+
+        if (outfit.user.toString() !== req.user._id.toString()) {
+            return res.status(401).json({
+                message: "Yetkisiz işlem"
+            })
+        }
+
+        outfit.title = title || outfit.title
+        outfit.occasion = occasion || outfit.occasion
+        if (notes !== undefined) outfit.notes = notes
+        if (items !== undefined) outfit.items = items
+
+        const updatedOutfit = await outfit.save()
+
+        res.status(200).json({
+            message: "Kombin güncellendi",
+            outfit: updatedOutfit
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Sunucu hatası",
+            error: error.message
+        })
+    }
+}
+
 exports.getFavoriteOutfits = async (req, res) => {
     try {
         const outfits = await Outfit.find({

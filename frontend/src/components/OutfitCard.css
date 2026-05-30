@@ -27,7 +27,8 @@
 .card-icon-btn--favorited {
   /* arka plan beyaz kalır, sadece yıldız karakteri ★ (dolu) olur */
   background: var(--color-bg);
-  color: var(--color-text);
+  color: #ffcc00;
+  text-shadow: 1px 1px 0 var(--color-text), -1px -1px 0 var(--color-text), 1px -1px 0 var(--color-text), -1px 1px 0 var(--color-text);
 }
 
 /* === HEADER === */

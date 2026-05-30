@@ -57,7 +57,7 @@ Sadece geçerli bir JSON döndür, başka hiçbir açıklama yapma. Markdown \`\
 
 exports.addClothing = async (req, res) => {
     try {
-        const { image, category, color, style, season } = req.body
+        const { image, category, color, style, season, brand } = req.body
 
         if (!image || !category || !color || !style || !season) {
             return res.status(400).json({
@@ -71,7 +71,8 @@ exports.addClothing = async (req, res) => {
             category,
             color,
             style,
-            season
+            season,
+            brand
         })
 
         res.status(201).json({
@@ -88,7 +89,7 @@ exports.addClothing = async (req, res) => {
 
 exports.uploadClothing = async (req, res) => {
     try {
-        const { category, color, style, season } = req.body
+        const { category, color, style, season, brand } = req.body
 
         if (!req.file) {
             return res.status(400).json({
@@ -131,7 +132,8 @@ exports.uploadClothing = async (req, res) => {
             category,
             color,
             style,
-            season
+            season,
+            brand
         })
 
         res.status(201).json({
@@ -233,7 +235,7 @@ exports.deleteClothing = async (req, res) => {
 
 exports.updateClothing = async (req, res) => {
     try {
-        const { category, color, style, season } = req.body
+        const { category, color, style, season, brand, image, notes } = req.body
 
         const clothing = await Clothing.findById(req.params.id)
 
@@ -253,6 +255,9 @@ exports.updateClothing = async (req, res) => {
         clothing.color = color || clothing.color
         clothing.style = style || clothing.style
         clothing.season = season || clothing.season
+        clothing.brand = brand || clothing.brand
+        if (image !== undefined) clothing.image = image
+        if (notes !== undefined) clothing.notes = notes
 
         const updatedClothing = await clothing.save()
 

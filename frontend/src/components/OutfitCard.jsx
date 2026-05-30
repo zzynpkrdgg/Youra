@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import ConfirmDialog from './ConfirmDialog';
 import './OutfitCard.css';
+import api from '../api/axios';
 
-export default function OutfitCard({ outfit, onDelete, onEdit }) {
+export default function OutfitCard({ outfit, onDelete, onEdit, onToggleFavorite }) {
   const [isFavorited, setIsFavorited] = useState(outfit.isFavorite ?? false);
   const [showConfirm, setShowConfirm] = useState(false);
   const confirmRef = useRef(null);
@@ -21,16 +22,22 @@ export default function OutfitCard({ outfit, onDelete, onEdit }) {
     return () => document.removeEventListener('mousedown', handler, true);
   }, [showConfirm]);
 
-  const formattedDate = new Date(outfit.savedAt).toLocaleDateString('tr-TR', {
+  const formattedDate = new Date(outfit.createdAt).toLocaleDateString('tr-TR', {
     day: 'numeric', month: 'long', year: 'numeric'
   }).toUpperCase();
 
-  const handleFavorite = () => {
-    const updated = !isFavorited;
-    setIsFavorited(updated);
-    const saved = JSON.parse(localStorage.getItem('youra_outfits') || '[]');
-    const updatedList = saved.map(o => o.id === outfit.id ? { ...o, isFavorite: updated } : o);
-    localStorage.setItem('youra_outfits', JSON.stringify(updatedList));
+  const handleFavorite = async () => {
+    const previous = isFavorited;
+    const next = !previous;
+    setIsFavorited(next);
+    if (onToggleFavorite) onToggleFavorite(outfit._id, next);
+    try {
+      await api.patch(`/outfit/${outfit._id}/favorite`);
+    } catch (err) {
+      setIsFavorited(previous);
+      if (onToggleFavorite) onToggleFavorite(outfit._id, previous);
+      alert('Favori güncellenemedi.');
+    }
   };
 
   return (
@@ -57,9 +64,9 @@ export default function OutfitCard({ outfit, onDelete, onEdit }) {
       {/* Başlık */}
       <div className="outfit-card-header">
         <div className="outfit-card-title-area">
-          <h3 className="outfit-card-name">{outfit.name}</h3>
-          {outfit.style && (
-            <span className="outfit-card-style">{outfit.style.toUpperCase()}</span>
+          <h3 className="outfit-card-name">{outfit.title}</h3>
+          {outfit.occasion && (
+            <span className="outfit-card-style">{outfit.occasion.toUpperCase()}</span>
           )}
         </div>
       </div>
@@ -71,12 +78,12 @@ export default function OutfitCard({ outfit, onDelete, onEdit }) {
             <div
               key={item._id ?? i}
               className="outfit-card-thumb"
-              title={item.name}
+              title={item.style}
               style={{
                 background: `linear-gradient(135deg, ${item.color ?? '#888'}88, ${item.color ?? '#888'}22)`,
               }}
             >
-              <span className="outfit-card-thumb-label">{item.name?.slice(0, 6)}</span>
+              <span className="outfit-card-thumb-label">{item.style?.slice(0, 6)}</span>
             </div>
           ))}
         </div>
@@ -100,11 +107,13 @@ export default function OutfitCard({ outfit, onDelete, onEdit }) {
 
       {/* Onay Diyaloğu */}
       {showConfirm && (
-        <ConfirmDialog
-          message="Bu kombini silmek istediğine emin misin?"
-          onCancel={() => setShowConfirm(false)}
-          onConfirm={() => { setShowConfirm(false); if (onDelete) onDelete(outfit.id); }}
-        />
+        <div ref={confirmRef}>
+          <ConfirmDialog
+            message="Bu kombini silmek istediğine emin misin?"
+            onCancel={() => setShowConfirm(false)}
+            onConfirm={() => { setShowConfirm(false); if (onDelete) onDelete(outfit._id); }}
+          />
+        </div>
       )}
     </div>
   );

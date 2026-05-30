@@ -232,8 +232,14 @@
   margin-top: var(--space-2);
 }
 
-.brut-dropzone-remove {
+.brut-image-preview-actions {
   align-self: flex-end;
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.brut-dropzone-remove {
   background: transparent;
   color: var(--color-text);
   border: 2px solid var(--color-text);
@@ -242,8 +248,10 @@
   font-size: var(--text-xs);
   padding: 2px 8px;
   cursor: pointer;
-  margin-bottom: var(--space-2); /* Outside the photo, above it */
   transition: all 0.1s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .brut-dropzone-remove:hover {

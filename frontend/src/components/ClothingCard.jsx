@@ -53,9 +53,9 @@ export default function ClothingCard({ item, onDelete, onEdit, onToggleDirty }) 
           ✏
         </button>
         <button
-          className={`card-icon-btn ${item.isDirty ? 'card-icon-btn--active' : ''}`}
-          title={item.isDirty ? 'Temizlendi İşaretle' : 'Kirli Sepetine At'}
-          onClick={(e) => { e.stopPropagation(); if (onToggleDirty) onToggleDirty(item._id); }}
+          className={`card-icon-btn ${item.status === 'dirty' ? 'card-icon-btn--active' : ''}`}
+          title={item.status === 'dirty' ? 'Temizlendi İşaretle' : 'Kirli Sepetine At'}
+          onClick={(e) => { e.stopPropagation(); if (onToggleDirty) onToggleDirty(item._id, item.status); }}
         >
           🧺
         </button>
@@ -65,12 +65,12 @@ export default function ClothingCard({ item, onDelete, onEdit, onToggleDirty }) 
       <div
         className="clothing-card-img"
         style={{
-          background: item.imageUrl
-            ? `url(${item.imageUrl}) center/cover no-repeat`
+          background: (item.image || item.imageUrl)
+            ? `url(${item.image || item.imageUrl}) center/cover no-repeat`
             : `linear-gradient(135deg, ${item.color ?? '#8b5cf6'}22, ${item.color ?? '#ec4899'}44)`,
         }}
       >
-        {!item.imageUrl && icon && <span className="clothing-card-emoji">{icon}</span>}
+        {!(item.image || item.imageUrl) && icon && <span className="clothing-card-emoji">{icon}</span>}
         {item.color && (
           <span
             className="clothing-color-dot"
@@ -82,28 +82,27 @@ export default function ClothingCard({ item, onDelete, onEdit, onToggleDirty }) 
 
       {/* İçerik */}
       <div className="clothing-card-body">
-        <div className="clothing-card-header">
-          <h3 className="clothing-card-name">{item.name}</h3>
-          {item.season && item.season !== 'Tümü' && (
-            <span className="clothing-card-season">{item.season}</span>
-          )}
-        </div>
-
-        <div className="clothing-card-meta">
-          <span className="clothing-card-brand">{item.category}</span>
-          {item.brand && (
-            <>
-              <span className="clothing-card-brand">•</span>
+        <div className="clothing-card-info-row">
+          <div className="clothing-card-info-left">
+            <h3 className="clothing-card-name">{item.name || item.style}</h3>
+            <span className="clothing-card-category">{item.category}</span>
+          </div>
+          
+          <div className="clothing-card-info-right">
+            {item.season && item.season !== 'Tümü' && (
+              <span className="clothing-card-season">{item.season}</span>
+            )}
+            {item.brand && (
               <span className="clothing-card-brand">{item.brand}</span>
-            </>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
       {/* Alt: SİL butonu — her zaman sabit */}
       <div className="clothing-card-footer">
         <button
-          className="card-delete-btn btn-sharp btn-sharp--black"
+          className="card-delete-btn"
           onClick={() => setShowConfirm(true)}
         >
           SİL
@@ -112,11 +111,13 @@ export default function ClothingCard({ item, onDelete, onEdit, onToggleDirty }) 
 
       {/* Onay Diyaloğu */}
       {showConfirm && (
-        <ConfirmDialog
-          message="Bu kıyafeti silmek istediğine emin misin?"
-          onCancel={() => setShowConfirm(false)}
-          onConfirm={() => { setShowConfirm(false); if (onDelete) onDelete(item._id); }}
-        />
+        <div ref={confirmRef}>
+          <ConfirmDialog
+            message="Bu kıyafeti silmek istediğine emin misin?"
+            onCancel={() => setShowConfirm(false)}
+            onConfirm={() => { setShowConfirm(false); if (onDelete) onDelete(item._id); }}
+          />
+        </div>
       )}
     </div>
   );

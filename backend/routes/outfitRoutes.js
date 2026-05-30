@@ -8,7 +8,8 @@ const {
     getMyOutfits,
     deleteOutfit,
     toggleFavoriteOutfit,
-    getFavoriteOutfits
+    getFavoriteOutfits,
+    updateOutfit
 } = require("../controllers/outfitController")
 
 const { protect } = require("../middleware/authMiddleware")
@@ -23,5 +24,6 @@ router.get("/", protect, getMyOutfits)
 router.delete("/:id", protect, deleteOutfit)
 router.get("/favorites", protect, getFavoriteOutfits)
 router.patch("/:id/favorite", protect, toggleFavoriteOutfit)
+router.put("/:id", protect, updateOutfit)
 
 module.exports = router;

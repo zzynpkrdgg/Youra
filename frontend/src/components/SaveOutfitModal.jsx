@@ -5,8 +5,8 @@ const STYLES = ['Günlük', 'Spor', 'Şık', 'İş', 'Gece', 'Plaj', 'Kış', 'Y
 
 const INITIAL_FORM = { name: '', style: '', notes: '' };
 
-export default function SaveOutfitModal({ onClose, onSubmit, loading, outfitItems = [] }) {
-  const [form, setForm] = useState(INITIAL_FORM);
+export default function SaveOutfitModal({ onClose, onSubmit, loading, outfitItems = [], initialData }) {
+  const [form, setForm] = useState(initialData || INITIAL_FORM);
 
   const set = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
 
@@ -23,7 +23,7 @@ export default function SaveOutfitModal({ onClose, onSubmit, loading, outfitItem
 
           {/* Header */}
           <div className="brut-modal-header">
-            <h2 className="brut-modal-title">KOMBİNİ KAYDET</h2>
+            <h2 className="brut-modal-title">{initialData ? 'KOMBİNİ DÜZENLE' : 'KOMBİNİ KAYDET'}</h2>
             <button type="button" className="brut-modal-close" onClick={onClose}>✕</button>
           </div>
           <div className="brut-modal-line-container">

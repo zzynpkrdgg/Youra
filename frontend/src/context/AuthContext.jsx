@@ -18,16 +18,6 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = useCallback(async (email, password) => {
-    // ── Mock kullanıcı (backend hazır olana kadar) ──────────
-    if (email === 'test@test.com' && password === '123456') {
-      const mockUser  = { _id: 'mock-001', name: 'Test Kullanıcı', email };
-      const mockToken = 'mock-token-dev';
-      localStorage.setItem('youra_token', mockToken);
-      localStorage.setItem('youra_user', JSON.stringify(mockUser));
-      setUser(mockUser);
-      return { user: mockUser, token: mockToken };
-    }
-    // ── Gerçek API ──────────────────────────────────────────
     const { data } = await api.post('/auth/login', { email, password });
     localStorage.setItem('youra_token', data.token);
     localStorage.setItem('youra_user', JSON.stringify(data.user));
@@ -50,12 +40,10 @@ export function AuthProvider({ children }) {
   }, []);
 
   const updateProfile = useCallback(async (updates) => {
-    // ── Mock Profil Güncelleme (Backend hazır olana kadar) ──
-    setUser(prev => {
-      const updatedUser = { ...prev, ...updates };
-      localStorage.setItem('youra_user', JSON.stringify(updatedUser));
-      return updatedUser;
-    });
+    const { data } = await api.put('/auth/profile', updates);
+    setUser(data.user);
+    localStorage.setItem('youra_user', JSON.stringify(data.user));
+    return data.user;
   }, []);
 
   return (

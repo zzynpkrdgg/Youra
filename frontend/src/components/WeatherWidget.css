@@ -147,8 +147,10 @@
 .cal-cell {
   height: 40px;
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
+  gap: 2px;
   font-size: 0.85rem;
   font-weight: 700;
   font-family: var(--font-mono);
@@ -167,10 +169,14 @@
   pointer-events: none;
 }
 
-.cal-cell--past {
+.cal-cell--disabled {
   color: #a0a0a0;
   background: #f5f5f5;
   cursor: not-allowed;
+}
+
+.cal-day-icon {
+  font-size: 10px;
 }
 
 .cal-cell--selectable {
@@ -206,10 +212,10 @@
 
 /* Static Mode Extensions */
 .weather-widget-wrapper.static-mode {
-  height: 100%;
+  height: auto;
 }
 .static-mode .weather-calendar-panel {
-  flex: 1;
+  flex: none;
   display: flex;
   flex-direction: column;
 }
@@ -217,9 +223,9 @@
   padding: 2px var(--space-4); /* AY değiştirme kısmını daralttık */
 }
 .static-mode .cal-grid {
-  flex: 1;
+  flex: none;
   grid-template-rows: auto repeat(6, 1fr);
 }
 .static-mode .cal-cell {
-  height: auto;
+  height: 30px;
 }

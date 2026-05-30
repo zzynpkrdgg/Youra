@@ -12,19 +12,7 @@ const CAT_ICONS = {
   'Ayakkabı':'','Aksesuar':'','Diğer':'',
 };
 
-// Demo kıyafetler (backend hazır olana kadar)
-const DEMO_ITEMS = [
-  { _id:'d1', name:'BEYAZ T-SHIRT',    category:'Üst',       color:'#e8e8e8', season:'Yaz',             brand:'ZARA' },
-  { _id:'d2', name:'SİYAH PANTOLON',   category:'Alt',       color:'#1a1a1a', season:'Tüm Mevsimler',   brand:'' },
-  { _id:'d3', name:'DENİM CEKET',      category:'Dış Giyim', color:'#5b7ea6', season:'İlkbahar',        brand:"LEVI'S" },
-  { _id:'d4', name:'BEYAZ SNEAKER',    category:'Ayakkabı',  color:'#f0f0f0', season:'Tüm Mevsimler',   brand:'NIKE' },
-  { _id:'d5', name:'ÇİZGİLİ GÖMLEK',   category:'Üst',       color:'#4a90e2', season:'Tüm Mevsimler',   brand:'' },
-  { _id:'d6', name:'CHINO PANTOLON',   category:'Alt',       color:'#c8a96e', season:'İlkbahar',        brand:'H&M' },
-  { _id:'d7', name:'SİYAH BLAZER',     category:'Dış Giyim', color:'#222222', season:'Tüm Mevsimler',   brand:'' },
-  { _id:'d8', name:'KIRMIZI ETEK',     category:'Elbise',    color:'#dc2626', season:'Yaz',             brand:'ZARA' },
-  { _id:'d9', name:'SPOR AYAKKABI',    category:'Ayakkabı',  color:'#f97316', season:'Yaz',             brand:'ADIDAS' },
-  { _id:'d10',name:'KETEN GÖMLEK',     category:'Üst',       color:'#d4c5a9', season:'Yaz',             brand:'' },
-];
+
 
 export default function Outfit() {
   const [wardrobe, setWardrobe]     = useState([]);
@@ -38,19 +26,28 @@ export default function Outfit() {
   const [showModal, setShowModal]         = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [addLoading, setAddLoading]       = useState(false);
+  const [saveLoading, setSaveLoading]     = useState(false);
 
   // Dolabı çek
   useEffect(() => {
     api.get('/clothing')
-      .then(({ data }) => setWardrobe(data.clothes || data || DEMO_ITEMS))
-      .catch(() => setWardrobe(DEMO_ITEMS));
+      .then(({ data }) => setWardrobe(data.clothes || []))
+      .catch(() => setWardrobe([]));
   }, []);
 
   // Kıyafet Ekle (Modal)
   const handleAdd = async (form) => {
     setAddLoading(true);
     try {
-      const { data } = await api.post('/clothing', form);
+      const payload = {
+        image: form.imageUrl || 'https://via.placeholder.com/200',
+        category: form.category,
+        color: form.color,
+        style: form.name,
+        season: form.season,
+        brand: form.brand,
+      };
+      const { data } = await api.post('/clothing', payload);
       // Yeni eklenen kıyafeti wardrobe state'ine ekle
       setWardrobe(prev => [data, ...prev]);
       setShowModal(false);
@@ -61,10 +58,12 @@ export default function Outfit() {
     }
   };
 
-  // Filtrele
-  const filtered = activeTab === 'Tümü'
-    ? wardrobe
-    : wardrobe.filter(i => i.category === activeTab);
+  // Filtrele: Kirli (status === 'dirty') olan kıyafetler kombin oluşturma sayfasında gözükmemeli
+  const filtered = wardrobe.filter(i => {
+    if (i.status === 'dirty') return false;
+    if (activeTab !== 'Tümü' && i.category !== activeTab) return false;
+    return true;
+  });
 
   // Drag handlers (sol panel)
   const handleDragStart = (e, item) => {
@@ -92,17 +91,25 @@ export default function Outfit() {
 
   const clearOutfit = () => setOutfitItems([]);
 
-  // Kombini localStorage'a kaydet
-  const handleSaveOutfit = (form) => {
-    const saved = JSON.parse(localStorage.getItem('youra_outfits') || '[]');
-    const newOutfit = {
-      id: Date.now().toString(),
-      ...form,
-    };
-    const updated = [newOutfit, ...saved];
-    localStorage.setItem('youra_outfits', JSON.stringify(updated));
-    setShowSaveModal(false);
-    alert(`"${form.name}" başarıyla kaydedildi!`);
+  // Kombini backend'e kaydet
+  const handleSaveOutfit = async (form) => {
+    setSaveLoading(true);
+    try {
+      const payload = {
+        title: form.name,
+        occasion: form.style,
+        items: form.items.map(i => i._id),
+      };
+      await api.post('/outfit', payload);
+      setShowSaveModal(false);
+      setOutfitItems([]);
+      alert(`"${form.name}" başarıyla kaydedildi!`);
+    } catch (err) {
+      console.error(err);
+      alert('Kombin kaydedilemedi.');
+    } finally {
+      setSaveLoading(false);
+    }
   };
 
   // AI Kombin oluştur
@@ -272,7 +279,13 @@ export default function Outfit() {
                   style={{ background: `linear-gradient(135deg, ${item.color}44, ${item.color}11)` }}
                 />
                 <div className="brut-ob-mini-info">
-                  <span className="brut-ob-mini-name">{item.name}</span>
+                  <span className="brut-ob-mini-name">{item.name || item.style}</span>
+                  <div className="brut-ob-mini-brand-color">
+                    <span className="brut-ob-mini-brand">{item.brand}</span>
+                    {item.color && (
+                      <span className="brut-ob-mini-colorbox" style={{ background: item.color }} />
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -324,7 +337,7 @@ export default function Outfit() {
                           className="brut-ob-canvas-thumb"
                           style={{ background: `linear-gradient(135deg, ${item.color}55, ${item.color}22)` }}
                         />
-                        <span className="brut-ob-canvas-name">{item.name}</span>
+                        <span className="brut-ob-canvas-name">{item.name || item.style}</span>
                         <button
                           className="brut-ob-canvas-remove"
                           onClick={() => removeFromOutfit(item._id)}
@@ -357,6 +370,7 @@ export default function Outfit() {
         <SaveOutfitModal
           onClose={() => setShowSaveModal(false)}
           onSubmit={handleSaveOutfit}
+          loading={saveLoading}
           outfitItems={outfitItems}
         />
       )}
