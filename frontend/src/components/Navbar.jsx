@@ -47,6 +47,15 @@ export default function Navbar() {
                   {label}
                 </Link>
               ))}
+              {user.role === 'admin' && (
+                <Link
+                  to="/admin"
+                  className={`navbar-link ${location.pathname === '/admin' ? 'active' : ''}`}
+                  style={{ color: '#ec4899' }}
+                >
+                  ADMIN PANEL
+                </Link>
+              )}
             </nav>
           )}
         </div>
