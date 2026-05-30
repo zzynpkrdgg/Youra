@@ -65,7 +65,7 @@ export default function Wardrobe() {
         brand: form.brand,
       };
       const { data } = await api.post('/clothing', payload);
-      setItems(prev => [data, ...prev]);
+      setItems(prev => [data.clothing, ...prev]);
       setShowModal(false);
     } catch (err) {
       alert(err.response?.data?.message ?? 'Eklenemedi.');
