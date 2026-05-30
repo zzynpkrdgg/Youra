@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import api from '../api/axios';
 import './WeatherWidget.css';
 
 // WMO Weather codes mapping
@@ -14,10 +13,10 @@ const getWeatherDetails = (code) => {
   return { icon: '🌡️', desc: 'BİLİNMİYOR' };
 };
 
-export default function WeatherWidget({ staticMode = false, onWeatherSelect }) {
+export default function WeatherWidget({ staticMode = false }) {
   const [expanded, setExpanded] = useState(false);
   const [weatherData, setWeatherData] = useState(null);
-  const [forecasts, setForecasts] = useState({});
+  const [forecastData, setForecastData] = useState([]);
 
   // Calendar states
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
@@ -25,66 +24,55 @@ export default function WeatherWidget({ staticMode = false, onWeatherSelect }) {
   const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
-    const fetchForecast = async () => {
-      try {
-        const { data } = await api.get('/weather/forecast?lat=41.0082&lon=28.9784&days=7');
-        const forecastMap = {};
-        let todayMs = new Date().setHours(0,0,0,0);
-        
-        data.forecast.forEach(day => {
-          const d = new Date(day.date);
-          d.setHours(0,0,0,0);
-          forecastMap[d.getTime()] = {
-            temperature: day.temperatureMax,
-            windspeed: day.windspeedMax,
-            weathercode: day.weathercode,
-            time: day.date
-          };
-        });
+    // Gelecekte backend'den çekilecek verinin birebir simülasyonu (7 günlük)
+    const baseTime = new Date();
+    baseTime.setHours(0,0,0,0);
+    const mockForecast = Array.from({ length: 7 }).map((_, i) => {
+      const d = new Date(baseTime);
+      d.setDate(d.getDate() + i);
+      d.setHours(12,0,0,0); // Öğlen vakti havası
+      return {
+        temperature: 15 + Math.random() * 5,
+        windspeed: 10 + Math.random() * 5,
+        weathercode: [0, 1, 3, 45, 51, 71, 95][Math.floor(Math.random() * 7)],
+        time: d.toISOString()
+      };
+    });
 
-        const currentRes = await api.get('/weather?lat=41.0082&lon=28.9784');
-        if (currentRes.data.weather) {
-            const today = new Date(currentRes.data.weather.time);
-            today.setHours(0,0,0,0);
-            todayMs = today.getTime();
-            forecastMap[todayMs] = currentRes.data.weather;
-        }
-
-        setForecasts(forecastMap);
-        
-        const initialDateMs = forecastMap[todayMs] ? todayMs : Object.keys(forecastMap)[0];
-        
-        setViewYear(new Date(Number(initialDateMs)).getFullYear());
-        setViewMonth(new Date(Number(initialDateMs)).getMonth());
-        
-        if (staticMode) {
-          setSelectedDate(Number(initialDateMs));
-        }
-        setWeatherData(forecastMap[initialDateMs]);
-        
-        if (onWeatherSelect && forecastMap[initialDateMs]) {
-          onWeatherSelect(forecastMap[initialDateMs]);
-        }
-        
-      } catch (err) {
-        console.error('Hava durumu alınamadı:', err);
-      }
+    const mockApiResponse = {
+      message: "Hava durumu getirildi",
+      location: { latitude: 39.9208, longitude: 32.8541 },
+      weather: mockForecast[0],
+      forecast: mockForecast
     };
-    fetchForecast();
-  }, [staticMode, onWeatherSelect]);
+    
+    setWeatherData(mockApiResponse.weather);
+    setForecastData(mockApiResponse.forecast);
+    
+    // Takvim başlangıcını gelen veriye (veya bugüne) göre ayarla
+    const d = new Date(mockApiResponse.weather.time);
+    setViewYear(d.getFullYear());
+    setViewMonth(d.getMonth());
+    
+    // Kombin sayfasında (staticMode) varsayılan olarak bugünü seç
+    if (staticMode) {
+      const today = new Date(mockApiResponse.weather.time);
+      today.setHours(0,0,0,0);
+      setSelectedDate(today.getTime());
+    }
+  }, [staticMode]);
 
   if (!weatherData) return null; // Veri yüklenene kadar boş
 
   // O anki tarihi 'bugün' olarak baz alıyoruz
-  const todayTime = new Date();
+  const todayTime = new Date(weatherData.time);
   todayTime.setHours(0,0,0,0);
   const todayMs = todayTime.getTime();
 
-  const selectedTime = new Date(weatherData.time);
-  const dateStr = selectedTime.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
-  const dayStr = selectedTime.toLocaleDateString('tr-TR', { weekday: 'long' }).toUpperCase();
+  const dateStr = todayTime.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
+  const dayStr = todayTime.toLocaleDateString('tr-TR', { weekday: 'long' }).toUpperCase();
   const temp = `${Math.round(weatherData.temperature)}°`;
-  const windInfo = `RÜZGAR: ${weatherData.windspeed} km/s`;
+  const windInfo = `RÜZGAR: ${Math.round(weatherData.windspeed)} km/s`;
   
   const { icon, desc } = getWeatherDetails(weatherData.weathercode);
 
@@ -166,15 +154,16 @@ export default function WeatherWidget({ staticMode = false, onWeatherSelect }) {
               const dateTime = date.getTime();
               const isToday = dateTime === todayMs;
               const isPast = dateTime < todayMs;
-              
-              // Max limit is 6 days after today (total 7 days)
-              const maxDateMs = todayMs + (6 * 24 * 60 * 60 * 1000);
-              const isFutureLimit = dateTime > maxDateMs;
-              
               const isSelected = selectedDate === dateTime;
+              
+              const maxForecastTime = new Date(todayMs);
+              maxForecastTime.setDate(maxForecastTime.getDate() + 6);
+              const isFutureOutsideForecast = dateTime > maxForecastTime.getTime();
+              
+              const isSelectable = !isPast && !isFutureOutsideForecast;
 
               let cls = 'cal-cell';
-              if (isPast || isFutureLimit) cls += ' cal-cell--past';
+              if (!isSelectable) cls += ' cal-cell--disabled';
               else cls += ' cal-cell--selectable';
 
               if (isSelected) cls += ' cal-cell--selected';
@@ -182,18 +171,24 @@ export default function WeatherWidget({ staticMode = false, onWeatherSelect }) {
 
               const handleClick = () => {
                 if (!staticMode) return; // Sadece kombin modunda gün seçilebilir
-                if (isPast || isFutureLimit) return; // Geçmiş veya 7 günden sonrası seçilemez
+                if (!isSelectable) return;
                 setSelectedDate(dateTime);
-                const w = forecasts[dateTime];
-                if (w) {
-                  setWeatherData(w);
-                  if (onWeatherSelect) onWeatherSelect(w);
-                }
               };
+
+              let dayForecast = null;
+              if (forecastData && forecastData.length > 0) {
+                dayForecast = forecastData.find(f => {
+                   const fd = new Date(f.time);
+                   fd.setHours(0,0,0,0);
+                   return fd.getTime() === dateTime;
+                });
+              }
+              const dayIcon = dayForecast ? getWeatherDetails(dayForecast.weathercode).icon : null;
 
               return (
                 <div key={i} className={cls} onClick={handleClick}>
-                  {date.getDate()}
+                  <span className="cal-date-number">{date.getDate()}</span>
+                  {dayIcon && <span className="cal-day-icon">{dayIcon}</span>}
                 </div>
               );
             })}

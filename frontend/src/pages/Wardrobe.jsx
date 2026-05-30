@@ -7,19 +7,14 @@ import './Wardrobe.css';
 const CATEGORIES = ['Tümü', 'Üst', 'Alt', 'Elbise', 'Dış Giyim', 'Ayakkabı', 'Aksesuar', 'Diğer'];
 const SEASONS    = ['Mevsim', 'İlkbahar', 'Yaz', 'Sonbahar', 'Kış'];
 
-const DEMO_ITEMS = [
-  { _id:'d1', name:'Beyaz T-Shirt',    category:'Üst',       color:'#e8e8e8', season:'Yaz',             brand:'Zara' },
-  { _id:'d2', name:'Siyah Pantolon',   category:'Alt',       color:'#1a1a1a', season:'Tüm Mevsimler',   brand:'' },
-  { _id:'d3', name:'Denim Ceket',      category:'Dış Giyim', color:'#5b7ea6', season:'İlkbahar',        brand:"Levi's" },
-  { _id:'d4', name:'Beyaz Sneaker',    category:'Ayakkabı',  color:'#f0f0f0', season:'Tüm Mevsimler',   brand:'Nike' },
-  { _id:'d5', name:'Çizgili Gömlek',   category:'Üst',       color:'#4a90e2', season:'Tüm Mevsimler',   brand:'' }
-];
+
 
 export default function Wardrobe() {
   const [items, setItems]           = useState([]);
   const [loading, setLoading]       = useState(true);
   const [addLoading, setAddLoading] = useState(false);
   const [showModal, setShowModal]   = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
   const [filterCat, setFilterCat]   = useState('Tümü');
   const [filterSea, setFilterSea]   = useState('Mevsim');
   const [search, setSearch]         = useState('');
@@ -31,8 +26,9 @@ export default function Wardrobe() {
     try {
       const { data } = await api.get('/clothing');
       setItems(data.clothes || []);
-    } catch {
-      setItems(DEMO_ITEMS);
+    } catch (err) {
+      setItems([]);
+      setError('Kıyafetler yüklenemedi.');
     } finally {
       setLoading(false);
     }
@@ -43,7 +39,6 @@ export default function Wardrobe() {
   const handleAdd = async (form) => {
     setAddLoading(true);
     try {
-      let newItem = null;
       if (form.file) {
         const formData = new FormData();
         formData.append('image', form.file);
@@ -51,23 +46,26 @@ export default function Wardrobe() {
         formData.append('color', form.color);
         formData.append('style', form.name);
         formData.append('season', form.season);
+        formData.append('brand', form.brand);
         
         const { data } = await api.post('/clothing/upload', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
-        newItem = data.clothing;
-      } else {
-        const payload = {
-          image: form.imageUrl || 'https://via.placeholder.com/200',
-          category: form.category,
-          color: form.color,
-          style: form.name,
-          season: form.season,
-        };
-        const { data } = await api.post('/clothing', payload);
-        newItem = data.clothing || data;
+        setItems(prev => [data.clothing, ...prev]);
+        setShowModal(false);
+        return;
       }
-      setItems(prev => [newItem, ...prev]);
+
+      const payload = {
+        image: form.imageUrl || 'https://via.placeholder.com/200',
+        category: form.category,
+        color: form.color,
+        style: form.name,
+        season: form.season,
+        brand: form.brand,
+      };
+      const { data } = await api.post('/clothing', payload);
+      setItems(prev => [data, ...prev]);
       setShowModal(false);
     } catch (err) {
       alert(err.response?.data?.message ?? 'Eklenemedi.');
@@ -76,8 +74,29 @@ export default function Wardrobe() {
     }
   };
 
+  const handleEdit = async (form) => {
+    setAddLoading(true);
+    try {
+      const payload = {
+        image: form.imageUrl,
+        category: form.category,
+        color: form.color,
+        style: form.name,
+        season: form.season,
+        brand: form.brand,
+        notes: form.notes
+      };
+      const { data } = await api.put(`/clothing/${editingItem._id}`, payload);
+      setItems(prev => prev.map(i => i._id === editingItem._id ? data.clothing : i));
+      setEditingItem(null);
+    } catch (err) {
+      alert(err.response?.data?.message ?? 'Güncellenemedi.');
+    } finally {
+      setAddLoading(false);
+    }
+  };
+
   const handleDelete = async (id) => {
-    if (!confirm('Bu kıyafeti silmek istediğine emin misin?')) return;
     try {
       await api.delete(`/clothing/${id}`);
       setItems(prev => prev.filter(i => i._id !== id));
@@ -86,26 +105,36 @@ export default function Wardrobe() {
     }
   };
 
-  const handleToggleDirty = async (id) => {
-    // Backend bağlı değilken state'te güncelle
-    setItems(prev => prev.map(item => 
-      item._id === id ? { ...item, isDirty: !item.isDirty } : item
-    ));
-    // Gerçek uygulamada api.patch çağrılır
+  const handleToggleDirty = async (id, currentStatus) => {
+    const newStatus = currentStatus === 'dirty' ? 'available' : 'dirty';
+    try {
+      await api.patch(`/clothing/${id}/status`, { status: newStatus });
+      setItems(prev => prev.map(item => 
+        item._id === id ? { ...item, status: newStatus } : item
+      ));
+    } catch (err) {
+      alert('Durum güncellenemedi.');
+    }
   };
 
   // Filter & search
   const filtered = items.filter(item => {
     const matchCat = filterCat === 'Tümü' || item.category === filterCat;
     const matchSea = filterSea === 'Mevsim' || filterSea === 'Tümü' || item.season === filterSea;
-    const itemName = item.style || item.name || '';
-    const matchQ   = !search || itemName.toLowerCase().includes(search.toLowerCase())
+    const matchQ   = !search || (item.name || item.style || '').toLowerCase().includes(search.toLowerCase())
                              || item.brand?.toLowerCase().includes(search.toLowerCase());
     
-    // showDirty false ise isDirty: true olanları gizle
-    const matchDirty = showDirty || !item.isDirty;
+    // showDirty true ise sadece kirlileri göster
+    const matchDirty = showDirty ? item.status === 'dirty' : true;
     
     return matchCat && matchSea && matchQ && matchDirty;
+  }).sort((a, b) => {
+    // Kirliler her zaman en altta olsun
+    const aIsDirty = a.status === 'dirty';
+    const bIsDirty = b.status === 'dirty';
+    if (aIsDirty && !bIsDirty) return 1;
+    if (!aIsDirty && bIsDirty) return -1;
+    return 0;
   });
 
   return (
@@ -135,7 +164,7 @@ export default function Wardrobe() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }} onClick={() => setShowDirty(!showDirty)}>
               <span style={{ fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', color: 'var(--color-text)' }}>
-                Kirlileri Göster
+                Sadece Kirlileri Göster
               </span>
               <div style={{
                 width: '24px', height: '24px', backgroundColor: 'var(--color-bg)', border: '2px solid var(--color-text)', 
@@ -176,7 +205,7 @@ export default function Wardrobe() {
             value={filterSea}
             onChange={e => setFilterSea(e.target.value)}
           >
-            {SEASONS.map(s => <option key={s} value={s}>{s.toUpperCase()}</option>)}
+            {SEASONS.map(s => <option key={s}>{s.toUpperCase()}</option>)}
           </select>
         </div>
 
@@ -201,6 +230,7 @@ export default function Wardrobe() {
                   key={item._id}
                   item={item}
                   onDelete={handleDelete}
+                  onEdit={(item) => setEditingItem(item)}
                   onToggleDirty={handleToggleDirty}
                 />
               ))}
@@ -215,6 +245,24 @@ export default function Wardrobe() {
         <AddClothingModal
           onClose={() => setShowModal(false)}
           onSubmit={handleAdd}
+          loading={addLoading}
+        />
+      )}
+
+      {/* Edit Clothing Modal */}
+      {editingItem && (
+        <AddClothingModal
+          initialData={{
+            name: editingItem.style || editingItem.name || '',
+            category: editingItem.category || 'Üst',
+            season: editingItem.season || 'Mevsim',
+            color: editingItem.color || '#000000',
+            brand: editingItem.brand || '',
+            imageUrl: editingItem.image || '',
+            notes: editingItem.notes || ''
+          }}
+          onClose={() => setEditingItem(null)}
+          onSubmit={handleEdit}
           loading={addLoading}
         />
       )}

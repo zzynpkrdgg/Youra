@@ -12,19 +12,7 @@ const CAT_ICONS = {
   'Ayakkabı':'','Aksesuar':'','Diğer':'',
 };
 
-// Demo kıyafetler (backend hazır olana kadar)
-const DEMO_ITEMS = [
-  { _id:'d1', name:'BEYAZ T-SHIRT',    category:'Üst',       color:'#e8e8e8', season:'Yaz',             brand:'ZARA' },
-  { _id:'d2', name:'SİYAH PANTOLON',   category:'Alt',       color:'#1a1a1a', season:'Tüm Mevsimler',   brand:'' },
-  { _id:'d3', name:'DENİM CEKET',      category:'Dış Giyim', color:'#5b7ea6', season:'İlkbahar',        brand:"LEVI'S" },
-  { _id:'d4', name:'BEYAZ SNEAKER',    category:'Ayakkabı',  color:'#f0f0f0', season:'Tüm Mevsimler',   brand:'NIKE' },
-  { _id:'d5', name:'ÇİZGİLİ GÖMLEK',   category:'Üst',       color:'#4a90e2', season:'Tüm Mevsimler',   brand:'' },
-  { _id:'d6', name:'CHINO PANTOLON',   category:'Alt',       color:'#c8a96e', season:'İlkbahar',        brand:'H&M' },
-  { _id:'d7', name:'SİYAH BLAZER',     category:'Dış Giyim', color:'#222222', season:'Tüm Mevsimler',   brand:'' },
-  { _id:'d8', name:'KIRMIZI ETEK',     category:'Elbise',    color:'#dc2626', season:'Yaz',             brand:'ZARA' },
-  { _id:'d9', name:'SPOR AYAKKABI',    category:'Ayakkabı',  color:'#f97316', season:'Yaz',             brand:'ADIDAS' },
-  { _id:'d10',name:'KETEN GÖMLEK',     category:'Üst',       color:'#d4c5a9', season:'Yaz',             brand:'' },
-];
+
 
 export default function Outfit() {
   const [wardrobe, setWardrobe]     = useState([]);
@@ -38,57 +26,30 @@ export default function Outfit() {
   const [showModal, setShowModal]         = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [addLoading, setAddLoading]       = useState(false);
-  const [weather, setWeather]             = useState(null);
-
-  // Hava durumunu çek (varsayılan: İstanbul koordinatları)
-  useEffect(() => {
-    const getWeatherData = async () => {
-      try {
-        const { data } = await api.get('/weather?lat=41.0082&lon=28.9784');
-        setWeather(data.weather);
-      } catch (err) {
-        console.log('Hava durumu alınamadı:', err.message);
-      }
-    };
-    getWeatherData();
-  }, []);
+  const [saveLoading, setSaveLoading]     = useState(false);
 
   // Dolabı çek
   useEffect(() => {
     api.get('/clothing')
-      .then(({ data }) => setWardrobe(data.clothes || data || DEMO_ITEMS))
-      .catch(() => setWardrobe(DEMO_ITEMS));
+      .then(({ data }) => setWardrobe(data.clothes || []))
+      .catch(() => setWardrobe([]));
   }, []);
 
   // Kıyafet Ekle (Modal)
   const handleAdd = async (form) => {
     setAddLoading(true);
     try {
-      let newItem = null;
-      if (form.file) {
-        const formData = new FormData();
-        formData.append('image', form.file);
-        formData.append('category', form.category);
-        formData.append('color', form.color);
-        formData.append('style', form.name);
-        formData.append('season', form.season);
-        
-        const { data } = await api.post('/clothing/upload', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        newItem = data.clothing;
-      } else {
-        const payload = {
-          image: form.imageUrl || 'https://via.placeholder.com/200',
-          category: form.category,
-          color: form.color,
-          style: form.name,
-          season: form.season,
-        };
-        const { data } = await api.post('/clothing', payload);
-        newItem = data.clothing || data;
-      }
-      setWardrobe(prev => [newItem, ...prev]);
+      const payload = {
+        image: form.imageUrl || 'https://via.placeholder.com/200',
+        category: form.category,
+        color: form.color,
+        style: form.name,
+        season: form.season,
+        brand: form.brand,
+      };
+      const { data } = await api.post('/clothing', payload);
+      // Yeni eklenen kıyafeti wardrobe state'ine ekle
+      setWardrobe(prev => [data, ...prev]);
       setShowModal(false);
     } catch (err) {
       alert(err.response?.data?.message ?? 'Eklenemedi.');
@@ -97,10 +58,12 @@ export default function Outfit() {
     }
   };
 
-  // Filtrele
-  const filtered = activeTab === 'Tümü'
-    ? wardrobe
-    : wardrobe.filter(i => i.category === activeTab);
+  // Filtrele: Kirli (status === 'dirty') olan kıyafetler kombin oluşturma sayfasında gözükmemeli
+  const filtered = wardrobe.filter(i => {
+    if (i.status === 'dirty') return false;
+    if (activeTab !== 'Tümü' && i.category !== activeTab) return false;
+    return true;
+  });
 
   // Drag handlers (sol panel)
   const handleDragStart = (e, item) => {
@@ -128,17 +91,25 @@ export default function Outfit() {
 
   const clearOutfit = () => setOutfitItems([]);
 
-  // Kombini localStorage'a kaydet
-  const handleSaveOutfit = (form) => {
-    const saved = JSON.parse(localStorage.getItem('youra_outfits') || '[]');
-    const newOutfit = {
-      id: Date.now().toString(),
-      ...form,
-    };
-    const updated = [newOutfit, ...saved];
-    localStorage.setItem('youra_outfits', JSON.stringify(updated));
-    setShowSaveModal(false);
-    alert(`"${form.name}" başarıyla kaydedildi!`);
+  // Kombini backend'e kaydet
+  const handleSaveOutfit = async (form) => {
+    setSaveLoading(true);
+    try {
+      const payload = {
+        title: form.name,
+        occasion: form.style,
+        items: form.items.map(i => i._id),
+      };
+      await api.post('/outfit', payload);
+      setShowSaveModal(false);
+      setOutfitItems([]);
+      alert(`"${form.name}" başarıyla kaydedildi!`);
+    } catch (err) {
+      console.error(err);
+      alert('Kombin kaydedilemedi.');
+    } finally {
+      setSaveLoading(false);
+    }
   };
 
   // AI Kombin oluştur
@@ -160,8 +131,7 @@ export default function Outfit() {
         mode:       currentMode,
         items:      outfitItems,
         styles,
-        wardrobe:   wardrobe,
-        weather:    weather
+        wardrobe:   wardrobe
       });
       
       const aiData = data.data;
@@ -219,7 +189,7 @@ export default function Outfit() {
         </div>
 
         <div className="brut-ob-top-left">
-          <WeatherWidget staticMode={true} onWeatherSelect={setWeather} />
+          <WeatherWidget staticMode={true} />
         </div>
         <div className="brut-ob-chat-section">
           
@@ -306,14 +276,16 @@ export default function Outfit() {
               >
                 <div
                   className="brut-ob-mini-thumb"
-                  style={!(item.image || item.imageUrl) ? { background: `linear-gradient(135deg, ${item.color}44, ${item.color}11)` } : {}}
-                >
-                  {(item.image || item.imageUrl) && (
-                    <img src={item.image || item.imageUrl} alt={item.style || item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                  )}
-                </div>
+                  style={{ background: `linear-gradient(135deg, ${item.color}44, ${item.color}11)` }}
+                />
                 <div className="brut-ob-mini-info">
-                  <span className="brut-ob-mini-name">{item.style || item.name}</span>
+                  <span className="brut-ob-mini-name">{item.name || item.style}</span>
+                  <div className="brut-ob-mini-brand-color">
+                    <span className="brut-ob-mini-brand">{item.brand}</span>
+                    {item.color && (
+                      <span className="brut-ob-mini-colorbox" style={{ background: item.color }} />
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -324,20 +296,15 @@ export default function Outfit() {
         {/* RIGHT — Kombin Kanvası */}
         <div className="brut-ob-right">
           <div className="brut-ob-right-header">
-            <h2 className="brut-ob-panel-title">
-              KANVAS
-              {weather && weather.weathercode !== undefined && (
-                ((weather.weathercode >= 51 && weather.weathercode <= 67) || 
-                 (weather.weathercode >= 80 && weather.weathercode <= 82) ||
-                 (weather.weathercode >= 95 && weather.weathercode <= 99))
-              ) && (
-                <span style={{ marginLeft: 10, fontSize: '1.2rem' }} title="Hava yağmurlu! Kombinine şemsiye veya uygun bir dış giyim eklemeyi unutma.">☔</span>
-              )}
-            </h2>
+            <h2 className="brut-ob-panel-title">KANVAS</h2>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              {outfitItems.length > 0 && (
-                <button className="brut-ob-clear-btn" onClick={clearOutfit}>TEMİZLE</button>
-              )}
+              <button
+                className="brut-ob-clear-btn"
+                onClick={clearOutfit}
+                style={{ visibility: outfitItems.length > 0 ? 'visible' : 'hidden' }}
+              >
+                TEMİZLE
+              </button>
               <button
                 className="brut-ob-save-btn"
                 onClick={() => setShowSaveModal(true)}
@@ -368,13 +335,9 @@ export default function Outfit() {
                       <div key={item._id} className="brut-ob-canvas-item animate-fadein">
                         <div
                           className="brut-ob-canvas-thumb"
-                          style={!(item.image || item.imageUrl) ? { background: `linear-gradient(135deg, ${item.color}55, ${item.color}22)` } : {}}
-                        >
-                          {(item.image || item.imageUrl) && (
-                            <img src={item.image || item.imageUrl} alt={item.style || item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                          )}
-                        </div>
-                        <span className="brut-ob-canvas-name">{item.style || item.name}</span>
+                          style={{ background: `linear-gradient(135deg, ${item.color}55, ${item.color}22)` }}
+                        />
+                        <span className="brut-ob-canvas-name">{item.name || item.style}</span>
                         <button
                           className="brut-ob-canvas-remove"
                           onClick={() => removeFromOutfit(item._id)}
@@ -407,6 +370,7 @@ export default function Outfit() {
         <SaveOutfitModal
           onClose={() => setShowSaveModal(false)}
           onSubmit={handleSaveOutfit}
+          loading={saveLoading}
           outfitItems={outfitItems}
         />
       )}

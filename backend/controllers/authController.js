@@ -49,7 +49,7 @@ const registerUser = async (req, res) => {
             token,
             user: {
                 id: user._id,
-                username: user.username,
+                name: user.username,
                 email: user.email,
                 style_preferences: user.style_preferences
             }
@@ -95,9 +95,60 @@ const loginUser = async (req, res) => {
             // Frontend'in yönlendirme yapabilmesi için 'user' objesi ZORUNLU!
             user: {
                 id: user._id,
-                username: user.username,
+                name: user.username,
                 email: user.email,
                 style_preferences: user.style_preferences
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Sunucu hatası oluştu" });
+    }
+}
+
+const updateProfile = async (req, res) => {
+    try {
+        const { name, email } = req.body;
+        const user = req.user;
+
+        if (name && name.length > 15) {
+            return res.status(400).json({ message: "İsim en fazla 15 karakter olabilir" });
+        }
+
+        if (name && name !== user.username) {
+            if (user.lastNameChangeAt) {
+                const diffTime = Math.abs(new Date() - new Date(user.lastNameChangeAt));
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                if (diffDays <= 15) {
+                    return res.status(400).json({ message: `İsim değiştirme hakkınız ${15 - diffDays + 1} gün sonra yenilenecektir` });
+                }
+            }
+            user.username = name;
+            user.lastNameChangeAt = new Date();
+        }
+
+        if (email && email !== user.email) {
+            if (!email.includes("@")) {
+                return res.status(400).json({ message: "Geçerli bir email giriniz" });
+            }
+            const User = require("../models/user");
+            const existing = await User.findOne({ email });
+            if (existing && existing._id.toString() !== user._id.toString()) {
+                return res.status(400).json({ message: "Bu email zaten kullanımda" });
+            }
+            user.email = email;
+        }
+
+        await user.save();
+
+        res.status(200).json({
+            message: "Profil güncellendi",
+            user: {
+                id: user._id,
+                name: user.username,
+                email: user.email,
+                style_preferences: user.style_preferences,
+                lastNameChangeAt: user.lastNameChangeAt
             }
         });
     } catch (error) {
@@ -109,5 +160,6 @@ const loginUser = async (req, res) => {
 module.exports = {
     testAuth,
     registerUser,
-    loginUser
+    loginUser,
+    updateProfile
 }

@@ -15,12 +15,11 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor — 401'de logout (mock token hariç)
+// Response interceptor — 401'de logout
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const token = localStorage.getItem('youra_token');
-    if (error.response?.status === 401 && token !== 'mock-token-dev') {
+    if (error.response?.status === 401) {
       localStorage.removeItem('youra_token');
       localStorage.removeItem('youra_user');
       window.location.href = '/login';

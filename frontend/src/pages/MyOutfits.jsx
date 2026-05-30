@@ -1,39 +1,83 @@
 import { useState, useEffect } from 'react';
 import OutfitCard from '../components/OutfitCard';
+import SaveOutfitModal from '../components/SaveOutfitModal';
 import './MyOutfits.css';
+import api from '../api/axios';
 
-const STYLE_FILTERS = ['Tümü', 'Günlük', 'Spor', 'Şık', 'İş', 'Gece', 'Plaj', 'Kış', 'Yaz', 'Vintage', 'Minimalist', 'Diğer'];
+const STYLE_FILTERS = ['Tümü', 'Favoriler', 'Günlük', 'Spor', 'Şık', 'İş', 'Gece', 'Plaj', 'Kış', 'Yaz', 'Vintage', 'Minimalist', 'Diğer'];
 
 export default function MyOutfits() {
   const [outfits, setOutfits]         = useState([]);
   const [filterStyle, setFilterStyle] = useState('Tümü');
   const [search, setSearch]           = useState('');
   const [sortOrder, setSortOrder]     = useState('desc'); // 'desc' = yeniden eskiye
+  const [editingOutfit, setEditingOutfit] = useState(null);
+  const [editLoading, setEditLoading] = useState(false);
 
-  // localStorage'dan kombinleri yükle
+  // Backendden kombinleri yükle
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('youra_outfits') || '[]');
-    setOutfits(saved);
+    const fetchOutfits = async () => {
+      try {
+        const { data } = await api.get('/outfit');
+        setOutfits(data.outfits || []);
+      } catch (err) {
+        console.error('Kombinler yüklenemedi:', err);
+      }
+    };
+    fetchOutfits();
   }, []);
 
-  const handleDelete = (id) => {
-    const updated = outfits.filter(o => o.id !== id);
-    setOutfits(updated);
-    localStorage.setItem('youra_outfits', JSON.stringify(updated));
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/outfit/${id}`);
+      setOutfits(prev => prev.filter(o => o._id !== id));
+    } catch (err) {
+      console.error('Kombin silinemedi:', err);
+      alert('Kombin silinemedi.');
+    }
+  };
+
+  const handleToggleFavorite = (id, newStatus) => {
+    setOutfits(prev => prev.map(o => o._id === id ? { ...o, isFavorite: newStatus } : o));
+  };
+
+  const handleEdit = async (form) => {
+    setEditLoading(true);
+    try {
+      const payload = {
+        title: form.name,
+        occasion: form.style,
+        notes: form.notes
+      };
+      const { data } = await api.put(`/outfit/${editingOutfit._id}`, payload);
+      setOutfits(prev => prev.map(o => o._id === editingOutfit._id ? {
+          ...o,
+          title: data.outfit.title,
+          occasion: data.outfit.occasion,
+          notes: data.outfit.notes,
+      } : o));
+      setEditingOutfit(null);
+    } catch (err) {
+      console.error(err);
+      alert('Kombin güncellenemedi.');
+    } finally {
+      setEditLoading(false);
+    }
   };
 
   // Filtrele + ara + sırala
   const filtered = outfits
     .filter(o => {
-      const matchStyle = filterStyle === 'Tümü' || o.style === filterStyle;
+      if (filterStyle === 'Favoriler' && !o.isFavorite) return false;
+      const matchStyle = filterStyle === 'Tümü' || filterStyle === 'Favoriler' || o.occasion === filterStyle;
       const matchSearch = !search ||
-        o.name?.toLowerCase().includes(search.toLowerCase()) ||
-        o.style?.toLowerCase().includes(search.toLowerCase()) ||
+        o.title?.toLowerCase().includes(search.toLowerCase()) ||
+        o.occasion?.toLowerCase().includes(search.toLowerCase()) ||
         o.notes?.toLowerCase().includes(search.toLowerCase());
       return matchStyle && matchSearch;
     })
     .sort((a, b) => {
-      const diff = new Date(a.savedAt) - new Date(b.savedAt);
+      const diff = new Date(a.createdAt) - new Date(b.createdAt);
       return sortOrder === 'desc' ? -diff : diff;
     });
 
@@ -113,9 +157,11 @@ export default function MyOutfits() {
               <div className="myoutfits-grid">
                 {filtered.map(outfit => (
                   <OutfitCard
-                    key={outfit.id}
+                    key={outfit._id}
                     outfit={outfit}
                     onDelete={handleDelete}
+                    onEdit={(outfit) => setEditingOutfit(outfit)}
+                    onToggleFavorite={handleToggleFavorite}
                   />
                 ))}
               </div>
@@ -124,6 +170,21 @@ export default function MyOutfits() {
 
         </div>
       </div>
+
+      {/* Edit Outfit Modal */}
+      {editingOutfit && (
+        <SaveOutfitModal
+          initialData={{
+            name: editingOutfit.title,
+            style: editingOutfit.occasion,
+            notes: editingOutfit.notes || ''
+          }}
+          outfitItems={editingOutfit.items}
+          onClose={() => setEditingOutfit(null)}
+          onSubmit={handleEdit}
+          loading={editLoading}
+        />
+      )}
     </div>
   );
 }

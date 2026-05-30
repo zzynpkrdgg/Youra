@@ -32,6 +32,10 @@ const clothingSchema = new mongoose.Schema(
             type: String,
             required: true
         },
+        brand: {
+            type: String,
+            default: ""
+        },
         status: {
             type: String,
             enum: ["available", "dirty"],
