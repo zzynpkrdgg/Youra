@@ -68,7 +68,7 @@ exports.addClothing = async (req, res) => {
         const clothing = await Clothing.create({
             user: req.user._id,
             image,
-            category,
+            category: category.trim(),
             color,
             style,
             season,
@@ -129,7 +129,7 @@ exports.uploadClothing = async (req, res) => {
         const clothing = await Clothing.create({
             user: req.user._id,
             image: imageUrl,
-            category,
+            category: category.trim(),
             color,
             style,
             season,
@@ -235,7 +235,7 @@ exports.deleteClothing = async (req, res) => {
 
 exports.updateClothing = async (req, res) => {
     try {
-        const { category, color, style, season, brand, image, notes } = req.body
+        const { category, color, style, season, brand, image, imageUrl, notes } = req.body
 
         const clothing = await Clothing.findById(req.params.id)
 
@@ -251,12 +251,13 @@ exports.updateClothing = async (req, res) => {
             })
         }
 
-        clothing.category = category || clothing.category
+        clothing.category = (category && category.trim()) || clothing.category
         clothing.color = color || clothing.color
         clothing.style = style || clothing.style
         clothing.season = season || clothing.season
         clothing.brand = brand || clothing.brand
         if (image !== undefined) clothing.image = image
+        if (imageUrl !== undefined) clothing.image = imageUrl
         if (notes !== undefined) clothing.notes = notes
 
         const updatedClothing = await clothing.save()

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import AddClothingModal from '../components/AddClothingModal';
 import SaveOutfitModal from '../components/SaveOutfitModal';
@@ -15,6 +16,7 @@ const CAT_ICONS = {
 
 
 export default function Outfit() {
+  const navigate = useNavigate();
   const [wardrobe, setWardrobe]     = useState([]);
   const [activeTab, setActiveTab]   = useState('Tümü');
   const [outfitItems, setOutfitItems] = useState([]);
@@ -61,7 +63,10 @@ export default function Outfit() {
   // Filtrele: Kirli (status === 'dirty') olan kıyafetler kombin oluşturma sayfasında gözükmemeli
   const filtered = wardrobe.filter(i => {
     if (i.status === 'dirty') return false;
-    if (activeTab !== 'Tümü' && i.category !== activeTab) return false;
+    // Kategori karşılaştırmasını normalize et
+    const normalizedItemCat = (i.category || '').trim();
+    const normalizedActiveTab = activeTab.trim();
+    if (normalizedActiveTab !== 'Tümü' && normalizedItemCat !== normalizedActiveTab) return false;
     return true;
   });
 
@@ -103,13 +108,20 @@ export default function Outfit() {
       await api.post('/outfit', payload);
       setShowSaveModal(false);
       setOutfitItems([]);
-      alert(`"${form.name}" başarıyla kaydedildi!`);
+      // Kombin kaydedildikten sonra Kombinlerim sayfasına yönlendir
+      navigate('/myoutfits');
     } catch (err) {
       console.error(err);
       alert('Kombin kaydedilemedi.');
     } finally {
       setSaveLoading(false);
     }
+  };
+  
+  // MyOutfits sayfasına kombin kaydedildiğinde haber ver
+  const onOutfitSaved = () => {
+    // MyOutfits sayfasını yeniden yüklemesi için bir mekanizma tetikleyebiliriz
+    // Şimdilik sadece bilgilendirme yapalım, manuel yenileme gerekebilir
   };
 
   // AI Kombin oluştur
@@ -276,7 +288,11 @@ export default function Outfit() {
               >
                 <div
                   className="brut-ob-mini-thumb"
-                  style={{ background: `linear-gradient(135deg, ${item.color}44, ${item.color}11)` }}
+                  style={{
+                    background: item.image
+                      ? `url(${item.image}) center/cover no-repeat`
+                      : `linear-gradient(135deg, ${item.color}44, ${item.color}11)`
+                  }}
                 />
                 <div className="brut-ob-mini-info">
                   <span className="brut-ob-mini-name">{item.name || item.style}</span>
@@ -335,7 +351,11 @@ export default function Outfit() {
                       <div key={item._id} className="brut-ob-canvas-item animate-fadein">
                         <div
                           className="brut-ob-canvas-thumb"
-                          style={{ background: `linear-gradient(135deg, ${item.color}55, ${item.color}22)` }}
+                          style={{
+                            background: item.image
+                              ? `url(${item.image}) center/cover no-repeat`
+                              : `linear-gradient(135deg, ${item.color}55, ${item.color}22)`
+                          }}
                         />
                         <span className="brut-ob-canvas-name">{item.name || item.style}</span>
                         <button

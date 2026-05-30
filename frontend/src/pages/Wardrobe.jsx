@@ -119,7 +119,10 @@ export default function Wardrobe() {
 
   // Filter & search
   const filtered = items.filter(item => {
-    const matchCat = filterCat === 'Tümü' || item.category === filterCat;
+    // Kategori karşılaştırmasını normalize et (trim ve sıfır space'ler)
+    const normalizedItemCat = (item.category || '').trim();
+    const normalizedFilterCat = filterCat.trim();
+    const matchCat = normalizedFilterCat === 'Tümü' || normalizedItemCat === normalizedFilterCat;
     const matchSea = filterSea === 'Mevsim' || filterSea === 'Tümü' || item.season === filterSea;
     const matchQ   = !search || (item.name || item.style || '').toLowerCase().includes(search.toLowerCase())
                              || item.brand?.toLowerCase().includes(search.toLowerCase());
