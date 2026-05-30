@@ -122,10 +122,42 @@
   color: var(--color-text);
 }
 
-@media (max-width: 768px) {
-  .onb-grid { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 900px) {
+  .onb-title {
+    font-size: var(--text-4xl);
+  }
 }
+
+@media (max-width: 768px) {
+  .onb-page {
+    padding-top: calc(var(--navbar-h, 70px) + var(--space-4));
+  }
+  .onb-grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-3); }
+}
+
 @media (max-width: 520px) {
-  .onb-grid { grid-template-columns: repeat(2, 1fr); }
+  .onb-title {
+    font-size: 2rem;
+  }
+  .onb-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-2); }
+  .onb-card {
+    padding: var(--space-3) var(--space-2);
+  }
+  .onb-card--active {
+    padding: calc(var(--space-3) - 2px) calc(var(--space-2) - 2px);
+  }
+  .onb-card--active:hover {
+    padding: var(--space-3) var(--space-2);
+  }
+  .onb-name {
+    font-size: 10px;
+  }
+  .onb-desc {
+    font-size: 9px;
+  }
   .onb-footer { flex-direction: column; gap: var(--space-4); text-align: center; }
+  .btn-lg {
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-sm);
+  }
 }

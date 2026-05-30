@@ -17,11 +17,11 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      await login(form.email, form.password);
+      const response = await login(form.email, form.password);
       
-      // Stil tercihi yoksa onboarding'e, varsa wardrobe'a git
-      const hasStyle = localStorage.getItem('youra_style_preferences');
-      if (hasStyle) {
+      // Backend'den gelen user objesinde stil tercihleri varsa kaydet
+      if (response.user && response.user.style_preferences && response.user.style_preferences.length > 0) {
+        localStorage.setItem('youra_style_preferences', JSON.stringify(response.user.style_preferences));
         navigate('/wardrobe');
       } else {
         navigate('/onboarding');
