@@ -232,8 +232,26 @@
   .brut-top-section {
     flex-direction: column;
     align-items: stretch;
+    gap: var(--space-3);
+  }
+  .brut-title-area {
+    width: 100%;
+  }
+  .brut-filter-tabs {
+    flex-wrap: wrap;
+    border-right: none;
+  }
+  .brut-tab {
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 2px solid var(--color-text);
+    flex-basis: 33.33%;
+    text-align: center;
+  }
+  .brut-tab:last-child {
+    border-right: 2px solid var(--color-text);
   }
   .brut-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-1);
   }
 }

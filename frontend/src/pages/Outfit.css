@@ -572,16 +572,33 @@
 
 @media (max-width: 900px) {
   .brut-ob-main-wrapper {
-    grid-template-columns: 1fr;
+    flex-direction: column;
     height: auto;
   }
-  .brut-ob-left {
+  .brut-ob-left-container {
     height: 400px;
+    flex: none;
   }
-  .brut-ob-canvas {
-    height: 400px;
+  .brut-ob-left {
+    position: relative;
+    height: 100%;
+  }
+  .brut-ob-right {
+    flex: none;
+  }
+  .brut-ob-top-split {
+    grid-template-columns: 1fr;
   }
   .brut-ob-title-area {
     width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .brut-ob-clothing-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .brut-ob-title {
+    font-size: 2rem;
   }
 }

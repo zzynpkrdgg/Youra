@@ -20,6 +20,8 @@ export default function Navbar() {
   };
 
   const [theme, setTheme] = useState('light');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
@@ -37,12 +39,13 @@ export default function Navbar() {
 
           {/* Nav links — yalnızca giriş yapılmışsa */}
           {user && (
-            <nav className="navbar-links">
+            <nav className={`navbar-links ${isMobileMenuOpen ? 'open' : ''}`}>
               {NAV_LINKS.map(({ to, label }) => (
                 <Link
                   key={to}
                   to={to}
                   className={`navbar-link ${location.pathname === to ? 'active' : ''}`}
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {label}
                 </Link>
@@ -68,6 +71,19 @@ export default function Navbar() {
           <button onClick={toggleTheme} className="theme-toggle-btn" title="Temayı Değiştir">
             {theme === 'light' ? '☾' : '☼'}
           </button>
+          
+          {/* Mobile Menu Toggle Button */}
+          {user && (
+            <button 
+              className="mobile-menu-btn"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              title="Menü"
+            >
+              <div className={`hamburger ${isMobileMenuOpen ? 'open' : ''}`}>
+                <span></span><span></span><span></span>
+              </div>
+            </button>
+          )}
         </div>
       </div>
     </header>
