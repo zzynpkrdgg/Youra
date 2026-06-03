@@ -14,7 +14,10 @@ const getWeatherDetails = (code) => {
 };
 
 export default function WeatherWidget({ staticMode = false }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(() => {
+    if (typeof window !== 'undefined' && window.innerWidth <= 768) return false;
+    return staticMode;
+  });
   const [weatherData, setWeatherData] = useState(null);
   const [forecastData, setForecastData] = useState([]);
 
@@ -138,7 +141,6 @@ export default function WeatherWidget({ staticMode = false }) {
             <div className="weather-day">{dayStr}</div>
           </div>
         </div>
-        {!staticMode && (
           <button 
             className="weather-toggle-btn" 
             onClick={() => setExpanded(!expanded)} 
@@ -146,10 +148,9 @@ export default function WeatherWidget({ staticMode = false }) {
           >
             {expanded ? '↑' : '↓'}
           </button>
-        )}
       </div>
 
-      {(expanded || staticMode) && (
+      {expanded && (
         <div className="weather-calendar-panel">
           <div className="weather-calendar-header">
             <button className="cal-nav-btn" onClick={prevMonth}>{'<'}</button>
