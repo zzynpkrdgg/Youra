@@ -36,6 +36,8 @@ export function AuthProvider({ children }) {
   const logout = useCallback(() => {
     localStorage.removeItem('youra_token');
     localStorage.removeItem('youra_user');
+    sessionStorage.removeItem('youra_chat_history');
+    sessionStorage.removeItem('youra_outfit_chat_history');
     setUser(null);
   }, []);
 

@@ -21,7 +21,17 @@ export default function Outfit() {
   const [activeTab, setActiveTab]   = useState('Tümü');
   const [outfitItems, setOutfitItems] = useState([]);
   const [chatInput, setChatInput]   = useState('');
-  const [messages, setMessages]     = useState([]);
+  const [messages, setMessages]     = useState(() => {
+    const saved = sessionStorage.getItem('youra_outfit_chat_history');
+    if (saved) {
+      try { return JSON.parse(saved); } catch { /* ignore */ }
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    sessionStorage.setItem('youra_outfit_chat_history', JSON.stringify(messages));
+  }, [messages]);
   const [generating, setGenerating] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const dragItemRef                 = useRef(null);

@@ -16,7 +16,18 @@ const SUGGESTIONS = [
 ];
 
 export default function ChatBot() {
-  const [messages, setMessages] = useState([WELCOME]);
+  const [messages, setMessages] = useState(() => {
+    const saved = sessionStorage.getItem('youra_chat_history');
+    if (saved) {
+      try { return JSON.parse(saved); } catch { /* ignore */ }
+    }
+    return [WELCOME];
+  });
+  
+  useEffect(() => {
+    sessionStorage.setItem('youra_chat_history', JSON.stringify(messages));
+  }, [messages]);
+
   const [input, setInput]       = useState('');
   const [loading, setLoading]   = useState(false);
   const bottomRef               = useRef(null);
