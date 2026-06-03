@@ -436,7 +436,8 @@
 
 .brut-ob-messages {
   flex: 1;
-  max-height: none;
+  height: 220px;
+  max-height: 220px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
