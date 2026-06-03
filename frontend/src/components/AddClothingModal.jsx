@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { removeBackground as imglyRemoveBackground } from '@imgly/background-removal';
 import './AddClothingModal.css';
 
 const CATEGORIES = ['Üst', 'Alt', 'Elbise', 'Dış Giyim', 'Ayakkabı', 'Aksesuar', 'Diğer'];
@@ -17,8 +18,48 @@ const INITIAL_FORM = {
 export default function AddClothingModal({ onClose, onSubmit, loading, initialData }) {
   const [form, setForm] = useState(initialData || INITIAL_FORM);
   const [isDragging, setIsDragging] = useState(false);
+  const [bgRemoving, setBgRemoving] = useState(false);
 
   const set = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
+
+  const processFile = async (file) => {
+    setBgRemoving(true);
+    try {
+      const transparentBlob = await imglyRemoveBackground(file);
+      const url = URL.createObjectURL(transparentBlob);
+      
+      const img = new Image();
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = url;
+      });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      
+      const whiteBgBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+      const newUrl = URL.createObjectURL(whiteBgBlob);
+      const newFile = new File([whiteBgBlob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", { type: 'image/jpeg' });
+      
+      set('imageUrl', newUrl);
+      set('file', newFile);
+    } catch (error) {
+      console.error("Background removal failed", error);
+      alert("Arka plan temizlenirken bir hata oluştu. Orijinal fotoğraf kullanılacak.");
+      const url = URL.createObjectURL(file);
+      set('imageUrl', url);
+      set('file', file);
+    } finally {
+      setBgRemoving(false);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -29,9 +70,7 @@ export default function AddClothingModal({ onClose, onSubmit, loading, initialDa
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    set('imageUrl', url);
-    set('file', file);
+    processFile(file);
   };
 
   const handleDrop = (e) => {
@@ -39,9 +78,7 @@ export default function AddClothingModal({ onClose, onSubmit, loading, initialDa
     setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
     if (file && file.type.startsWith('image/')) {
-      const url = URL.createObjectURL(file);
-      set('imageUrl', url);
-      set('file', file);
+      processFile(file);
     }
   };
 
@@ -141,7 +178,14 @@ export default function AddClothingModal({ onClose, onSubmit, loading, initialDa
             {/* RIGHT SIDE (40%) */}
             <div className="brut-modal-right">
               <label className="brut-label">FOTOĞRAF YÜKLE</label>
-              {form.imageUrl ? (
+              {bgRemoving ? (
+                <div className="brut-image-preview-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', height: '100%', border: '2px dashed var(--color-text)', padding: '20px' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontWeight: 900, fontSize: '14px', marginBottom: '10px', color: 'var(--color-text)' }}>YAPAY ZEKA ÇALIŞIYOR...</div>
+                    <div style={{ fontSize: '11px', color: 'var(--color-text)', fontWeight: 700, opacity: 0.7 }}>Arka plan temizleniyor (İlk seferde 10-15 sn sürebilir).<br/>Lütfen bekleyin...</div>
+                  </div>
+                </div>
+              ) : form.imageUrl ? (
                 <div className="brut-image-preview-container">
                   <div className="brut-image-preview-actions">
                     <label className="brut-dropzone-remove">
@@ -178,8 +222,8 @@ export default function AddClothingModal({ onClose, onSubmit, loading, initialDa
           {/* Footer */}
           <div className="brut-modal-footer">
             <button type="button" className="btn-sharp btn-sharp--white brut-modal-cancel" onClick={onClose}>İPTAL</button>
-            <button type="submit" className="btn-sharp btn-sharp--black brut-modal-submit" disabled={loading || !form.name.trim()}>
-              {loading ? 'KAYDEDİLİYOR...' : (initialData ? 'KAYDET' : 'EKLE')}
+            <button type="submit" className="btn-sharp btn-sharp--black brut-modal-submit" disabled={loading || bgRemoving || !form.name.trim()}>
+              {loading ? 'KAYDEDİLİYOR...' : bgRemoving ? 'BEKLEYİN...' : (initialData ? 'KAYDET' : 'EKLE')}
             </button>
           </div>
         </form>
