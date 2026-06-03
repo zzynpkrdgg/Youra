@@ -145,7 +145,7 @@ export default function Profile() {
             <div className="profile-card-content" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               {/* Clothing Section */}
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span className="profile-stat-number" style={{ fontSize: '1.2rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>TOPLAM KIYAFET - {loadingItems ? '-' : clothingCount}</span>
+                <span className="profile-stat-number" style={{ fontSize: '1.8rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>TOPLAM KIYAFET - {loadingItems ? '-' : clothingCount}</span>
               </div>
 
               {/* Divider */}
@@ -153,7 +153,7 @@ export default function Profile() {
 
               {/* Outfits Section */}
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span className="profile-stat-number" style={{ fontSize: '1.2rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>TOPLAM KOMBİN - {loadingItems ? '-' : outfitCount}</span>
+                <span className="profile-stat-number" style={{ fontSize: '1.8rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>TOPLAM KOMBİN - {loadingItems ? '-' : outfitCount}</span>
               </div>
 
             </div>
