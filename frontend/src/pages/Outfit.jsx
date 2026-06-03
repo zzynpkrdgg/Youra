@@ -25,6 +25,7 @@ export default function Outfit() {
   const [generating, setGenerating] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const dragItemRef                 = useRef(null);
+  const messagesContainerRef        = useRef(null);
   const [showModal, setShowModal]         = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [addLoading, setAddLoading]       = useState(false);
@@ -36,6 +37,16 @@ export default function Outfit() {
       .then(({ data }) => setWardrobe(data.clothes || []))
       .catch(() => setWardrobe([]));
   }, []);
+
+  // Mesajlar için auto-scroll
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, [messages, generating]);
 
   // Kıyafet Ekle (Modal)
   const handleAdd = async (form) => {
@@ -206,7 +217,7 @@ export default function Outfit() {
         <div className="brut-ob-chat-section">
           
           <div className="brut-ob-messages-wrapper">
-          <div className="brut-ob-messages">
+          <div className="brut-ob-messages" ref={messagesContainerRef}>
             {messages.map((m, i) => (
               <div key={i} className={`brut-ob-msg ${m.role === 'ai' ? 'msg-ai' : 'msg-user'}`}>
                 <div className="brut-ob-msg-avatar">{m.role === 'ai' ? 'AI' : 'U'}</div>

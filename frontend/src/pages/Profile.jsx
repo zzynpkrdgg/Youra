@@ -51,8 +51,8 @@ export default function Profile() {
           api.get('/clothing'),
           api.get('/outfit')
         ]);
-        setClothingCount(clothRes.data.length);
-        setOutfitCount(outfitRes.data.length);
+        setClothingCount(clothRes.data.clothes?.length || 0);
+        setOutfitCount(outfitRes.data.outfits?.length || 0);
       } catch {
         // Fallback mock number
         setClothingCount(5); 
@@ -143,30 +143,17 @@ export default function Profile() {
           <div className="profile-card">
             <h2 className="profile-card-title">DOLAP DURUMU</h2>
             <div className="profile-card-content" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-              
               {/* Clothing Section */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div>
-                  <span className="profile-stat-number" style={{ fontSize: '2.5rem' }}>{loadingItems ? '-' : clothingCount}</span>
-                  <p style={{ marginTop: '5px', fontWeight: 'bold' }}>TOPLAM KIYAFET</p>
-                </div>
-                <button className="btn-sharp btn-sharp--black" onClick={() => navigate('/wardrobe')} style={{ padding: '8px 16px', fontSize: '14px' }}>
-                  DOLABA GİT
-                </button>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="profile-stat-number" style={{ fontSize: '1.2rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>TOPLAM KIYAFET - {loadingItems ? '-' : clothingCount}</span>
               </div>
 
               {/* Divider */}
               <div style={{ height: '2px', background: 'var(--color-text)', width: '100%' }}></div>
 
               {/* Outfits Section */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div>
-                  <span className="profile-stat-number" style={{ fontSize: '2.5rem' }}>{loadingItems ? '-' : outfitCount}</span>
-                  <p style={{ marginTop: '5px', fontWeight: 'bold' }}>TOPLAM KOMBİN</p>
-                </div>
-                <button className="btn-sharp btn-sharp--black" onClick={() => navigate('/my-outfits')} style={{ padding: '8px 16px', fontSize: '14px' }}>
-                  KOMBİNLERE GİT
-                </button>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="profile-stat-number" style={{ fontSize: '1.2rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>TOPLAM KOMBİN - {loadingItems ? '-' : outfitCount}</span>
               </div>
 
             </div>

@@ -69,12 +69,24 @@ export default function WeatherWidget({ staticMode = false }) {
   todayTime.setHours(0,0,0,0);
   const todayMs = todayTime.getTime();
 
-  const dateStr = todayTime.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
-  const dayStr = todayTime.toLocaleDateString('tr-TR', { weekday: 'long' }).toUpperCase();
-  const temp = `${Math.round(weatherData.temperature)}°`;
-  const windInfo = `RÜZGAR: ${Math.round(weatherData.windspeed)} km/s`;
+  // Seçili tarihe ait hava durumunu bul
+  let activeWeather = weatherData;
+  if (selectedDate && forecastData) {
+    const selectedForecast = forecastData.find(f => {
+      const fd = new Date(f.time);
+      fd.setHours(0,0,0,0);
+      return fd.getTime() === selectedDate;
+    });
+    if (selectedForecast) activeWeather = selectedForecast;
+  }
+
+  const activeTime = new Date(activeWeather.time);
+  const dateStr = activeTime.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
+  const dayStr = activeTime.toLocaleDateString('tr-TR', { weekday: 'long' }).toUpperCase();
+  const temp = `${Math.round(activeWeather.temperature)}°`;
+  const windInfo = `RÜZGAR: ${Math.round(activeWeather.windspeed)} km/s`;
   
-  const { icon, desc } = getWeatherDetails(weatherData.weathercode);
+  const { icon, desc } = getWeatherDetails(activeWeather.weathercode);
 
   const daysOfWeek = ['PZT', 'SAL', 'ÇAR', 'PER', 'CUM', 'CMT', 'PAZ'];
   const monthNames = ['OCAK', 'ŞUBAT', 'MART', 'NİSAN', 'MAYIS', 'HAZİRAN', 'TEMMUZ', 'AĞUSTOS', 'EYLÜL', 'EKİM', 'KASIM', 'ARALIK'];
