@@ -36,6 +36,7 @@ export default function Profile() {
   const [editName, setEditName] = useState(user?.name || '');
   const [editEmail, setEditEmail] = useState(user?.email || '');
   const [tempStyles, setTempStyles] = useState([]);
+  const [profileError, setProfileError] = useState('');
 
   useEffect(() => {
     if (!user) return;
@@ -71,11 +72,12 @@ export default function Profile() {
 
   const handleProfileSave = async (e) => {
     e.preventDefault();
+    setProfileError('');
     try {
       await updateProfile({ name: editName, email: editEmail });
       setShowProfileModal(false);
     } catch (err) {
-      alert(err.response?.data?.message || 'Profil güncellenemedi');
+      setProfileError(err.response?.data?.message || 'Profil güncellenemedi');
     }
   };
 
@@ -127,6 +129,7 @@ export default function Profile() {
             <button className="btn-sharp btn-sharp--white" onClick={() => {
               setEditName(user.name);
               setEditEmail(user.email);
+              setProfileError('');
               setShowProfileModal(true);
             }}>
               PROFİLİ DÜZENLE
@@ -199,13 +202,17 @@ export default function Profile() {
                 <input 
                   className="modal-input" 
                   value={editName} 
-                  onChange={e => setEditName(e.target.value)} 
+                  onChange={e => {
+                    setEditName(e.target.value);
+                    setProfileError('');
+                  }} 
                   placeholder="Ad Soyad"
                   maxLength={15}
                   disabled={!canEditName()}
                   required
                 />
                 {!canEditName() && <span style={{fontSize: '11px', color: 'red', fontWeight: 'bold'}}>Kullanıcı isminizi {getNextNameChangeDate()} tarihinde değiştirebilirsiniz.</span>}
+                {profileError && <span style={{fontSize: '12px', color: 'red', fontWeight: 'bold', marginTop: '4px'}}>{profileError}</span>}
               </div>
               <input 
                 className="modal-input" 
