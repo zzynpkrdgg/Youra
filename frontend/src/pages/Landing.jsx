@@ -85,7 +85,7 @@ export default function Landing({ initialForm = null }) {
                   <Link to="/wardrobe" className="btn-sharp btn-sharp--black">
                     Dolabıma Git
                   </Link>
-                  <Link to="/outfit" className="btn-sharp btn-sharp--white">
+                  <Link to="/create" className="btn-sharp btn-sharp--white">
                     Kombin Öner
                   </Link>
                 </>
