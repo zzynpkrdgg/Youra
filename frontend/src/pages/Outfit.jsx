@@ -63,10 +63,10 @@ export default function Outfit() {
   // Filtrele: Kirli (status === 'dirty') olan kıyafetler kombin oluşturma sayfasında gözükmemeli
   const filtered = wardrobe.filter(i => {
     if (i.status === 'dirty') return false;
-    // Kategori karşılaştırmasını normalize et
-    const normalizedItemCat = (i.category || '').trim();
-    const normalizedActiveTab = activeTab.trim();
-    if (normalizedActiveTab !== 'Tümü' && normalizedItemCat !== normalizedActiveTab) return false;
+    // Kategori karşılaştırmasını normalize et (case-insensitive)
+    const normalizedItemCat = (i.category || '').trim().toLowerCase();
+    const normalizedActiveTab = activeTab.trim().toLowerCase();
+    if (normalizedActiveTab !== 'tümü' && normalizedItemCat !== normalizedActiveTab) return false;
     return true;
   });
 
