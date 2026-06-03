@@ -10,6 +10,7 @@ import Outfit        from './pages/Outfit';
 import MyOutfits     from './pages/MyOutfits';
 import Profile       from './pages/Profile';
 import StyleOnboarding from './pages/StyleOnboarding';
+import AdminPanel      from './pages/AdminPanel';
 
 // Protected route wrapper
 function ProtectedRoute({ children }) {
@@ -61,6 +62,10 @@ function AppRoutes() {
 
         <Route path="/profile" element={
           <ProtectedRoute><Profile /></ProtectedRoute>
+        } />
+
+        <Route path="/admin" element={
+          <ProtectedRoute><AdminPanel /></ProtectedRoute>
         } />
 
         <Route path="*" element={<Navigate to="/" replace />} />

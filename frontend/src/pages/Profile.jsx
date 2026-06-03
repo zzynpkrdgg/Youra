@@ -126,6 +126,11 @@ export default function Profile() {
             <p className="profile-email">{user.email}</p>
           </div>
           <div className="profile-header-actions">
+            {user?.role === 'admin' && (
+              <button className="btn-sharp btn-sharp--black" style={{ background: '#7c3aed', borderColor: '#7c3aed', color: 'white' }} onClick={() => navigate('/admin')}>
+                ADMİN PANELİ
+              </button>
+            )}
             <button className="btn-sharp btn-sharp--white" onClick={() => {
               setEditName(user.name);
               setEditEmail(user.email);

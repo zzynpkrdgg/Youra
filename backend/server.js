@@ -32,8 +32,10 @@ const clothingRoutes = require('./routes/clothingRoutes');
 const outfitRoutes = require('./routes/outfitRoutes');
 const authRoutes = require('./routes/authRoutes');
 const weatherRoutes = require('./routes/weatherRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Aliased routes so both your AI integration and friend's DB integration work without changing frontend code
 app.use('/api/auth', authRoutes);
