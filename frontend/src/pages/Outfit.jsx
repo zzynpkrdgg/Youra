@@ -100,16 +100,21 @@ export default function Outfit() {
   // Drop handlers (sağ kanvas)
   const handleDragOver = (e) => { e.preventDefault(); setIsDragOver(true); };
   const handleDragLeave = () => setIsDragOver(false);
+
+  const addItemToOutfit = (item) => {
+    setOutfitItems(prev => {
+      const filtered = prev.filter(i => i.category !== item.category);
+      return [...filtered, item].slice(0, 9);
+    });
+  };
+
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragOver(false);
     if (!dragItemRef.current) return;
     const item = dragItemRef.current;
     dragItemRef.current = null;
-    setOutfitItems(prev => {
-      const filtered = prev.filter(i => i.category !== item.category);
-      return [...filtered, item].slice(0, 9);
-    });
+    addItemToOutfit(item);
   };
 
   const removeFromOutfit = (id) =>
@@ -306,6 +311,7 @@ export default function Outfit() {
                 className="brut-ob-mini-card"
                 draggable
                 onDragStart={e => handleDragStart(e, item)}
+                onClick={() => addItemToOutfit(item)}
               >
                 <div
                   className="brut-ob-mini-thumb"
@@ -361,7 +367,7 @@ export default function Outfit() {
           >
             {outfitItems.length === 0 ? (
               <div className="brut-ob-canvas-placeholder">
-                <p>KIYAFETLERİ<br/>SÜRÜKLE</p>
+                <p>KIYAFETLERİ SÜRÜKLE<br/><span style={{ fontSize: '1rem', fontWeight: 700, opacity: 0.8 }}>VEYA SEÇ</span></p>
               </div>
             ) : (
               <div className="brut-ob-canvas-items">

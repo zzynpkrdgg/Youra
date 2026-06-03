@@ -211,8 +211,8 @@ export default function AddClothingModal({ onClose, onSubmit, loading, initialDa
                 >
                   <input type="file" accept="image/*" onChange={handleFileChange} hidden />
                   <div className="brut-dropzone-content">
-                    <span className="brut-dropzone-icon">+</span>
-                    <span className="brut-dropzone-text">SÜRÜKLE BIRAK VEYA<br/>SEÇMEK İÇİN TIKLA</span>
+                    <span className="brut-dropzone-icon">📷</span>
+                    <span className="brut-dropzone-text">FOTOĞRAF ÇEK / SEÇ <br/><span className="desktop-only">VEYA SÜRÜKLE BIRAK</span></span>
                   </div>
                 </label>
               )}

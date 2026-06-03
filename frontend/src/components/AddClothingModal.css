@@ -288,7 +288,22 @@
   .brut-modal-body {
     flex-direction: column;
   }
-  .brut-dropzone {
-    min-height: 200px;
+  .brut-modal-right {
+    order: -1;
+    margin-bottom: var(--space-4);
   }
+  .brut-dropzone {
+    min-height: 250px;
+    border-width: 3px;
+  }
+  .brut-dropzone-icon {
+    font-size: 3rem;
+  }
+  .desktop-only {
+    display: none;
+  }
+}
+
+.desktop-only {
+  display: inline;
 }
