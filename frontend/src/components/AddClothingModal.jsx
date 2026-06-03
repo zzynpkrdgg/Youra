@@ -79,13 +79,13 @@ export default function AddClothingModal({ onClose, onSubmit, loading, initialDa
                 <div className="brut-form-group">
                   <label className="brut-label">KATEGORİ</label>
                   <select className="brut-select" value={form.category} onChange={e => set('category', e.target.value)}>
-                    {CATEGORIES.map(c => <option key={c}>{c.toUpperCase()}</option>)}
+                    {CATEGORIES.map(c => <option key={c} value={c}>{c.toUpperCase()}</option>)}
                   </select>
                 </div>
                 <div className="brut-form-group">
                   <label className="brut-label">MEVSİM</label>
                   <select className="brut-select" value={form.season} onChange={e => set('season', e.target.value)}>
-                    {SEASONS.map(s => <option key={s}>{s.toUpperCase()}</option>)}
+                    {SEASONS.map(s => <option key={s} value={s}>{s.toUpperCase()}</option>)}
                   </select>
                 </div>
               </div>

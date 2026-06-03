@@ -119,11 +119,14 @@ export default function Wardrobe() {
 
   // Filter & search
   const filtered = items.filter(item => {
-    // Kategori karşılaştırmasını normalize et (trim ve sıfır space'ler)
-    const normalizedItemCat = (item.category || '').trim();
-    const normalizedFilterCat = filterCat.trim();
-    const matchCat = normalizedFilterCat === 'Tümü' || normalizedItemCat === normalizedFilterCat;
-    const matchSea = filterSea === 'Mevsim' || filterSea === 'Tümü' || item.season === filterSea;
+    // Kategori karşılaştırmasını normalize et (case-insensitive)
+    const normalizedItemCat = (item.category || '').trim().toLowerCase();
+    const normalizedFilterCat = filterCat.trim().toLowerCase();
+    const matchCat = normalizedFilterCat === 'tümü' || normalizedItemCat === normalizedFilterCat;
+    
+    const normalizedItemSea = (item.season || '').trim().toLowerCase();
+    const normalizedFilterSea = filterSea.trim().toLowerCase();
+    const matchSea = normalizedFilterSea === 'mevsim' || normalizedFilterSea === 'tümü' || normalizedItemSea === normalizedFilterSea;
     const matchQ   = !search || (item.name || item.style || '').toLowerCase().includes(search.toLowerCase())
                              || item.brand?.toLowerCase().includes(search.toLowerCase());
     
@@ -208,7 +211,7 @@ export default function Wardrobe() {
             value={filterSea}
             onChange={e => setFilterSea(e.target.value)}
           >
-            {SEASONS.map(s => <option key={s}>{s.toUpperCase()}</option>)}
+            {SEASONS.map(s => <option key={s} value={s}>{s.toUpperCase()}</option>)}
           </select>
         </div>
 
